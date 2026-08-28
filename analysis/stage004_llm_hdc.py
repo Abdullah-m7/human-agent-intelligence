@@ -7,22 +7,20 @@ one hash-selected hidden training demonstration (HDC) in a separate call.
 from __future__ import annotations
 
 import argparse
-import csv
 import hashlib
 import json
-import os
 import re
-import sys
 import time
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
-from urllib import request, error
+from urllib import error, request
 
 REPO = Path(__file__).resolve().parents[1]
 SPLIT_FILE = REPO / "benchmarks" / "capability_twin" / "stage004_split.json"
 LOCK_FILE = REPO / "papers" / "01_agentic_bottleneck" / "STAGE004_CONFIRMATORY_LOCK_V1.md"
 DEFAULT_DATA = Path("/tmp/CogARC-dataRepository/Task JSONs")
+MAX_TOKENS = 120
 
 SYSTEM_PROMPT = (
     "You are a precise ARC grid-transformation solver. Infer the transformation "
@@ -42,7 +40,12 @@ RESPONSE_FORMAT = {
         "strict": True,
         "schema": {
             "type": "object",
-            "properties": {"grid": {"type": "string", "pattern": "^[0-9](,[0-9])*(;[0-9](,[0-9])*)*$"}},
+            "properties": {
+                "grid": {
+                    "type": "string",
+                    "pattern": "^[0-9](,[0-9])*(;[0-9](,[0-9])*)*$",
+                }
+            },
             "required": ["grid"],
             "additionalProperties": False,
         },
@@ -58,7 +61,18 @@ def canonical_json(obj: Any) -> str:
     return json.dumps(obj, separators=(",", ":"), sort_keys=True, ensure_ascii=False)
 
 
+def contract_hashes() -> Dict[str, str]:
+    return {
+        "split_sha256": sha256_bytes(SPLIT_FILE.read_bytes()),
+        "system_prompt_sha256": sha256_bytes(SYSTEM_PROMPT.encode("utf-8")),
+        "user_template_sha256": sha256_bytes(USER_TEMPLATE.encode("utf-8")),
+        "response_format_sha256": sha256_bytes(canonical_json(RESPONSE_FORMAT).encode("utf-8")),
+    }
+
+
 def hdc_index(task_id: str, n_train: int) -> int:
+    if n_train <= 0:
+        raise ValueError("n_train must be positive")
     return int(hashlib.sha256(task_id.encode("utf-8")).hexdigest(), 16) % n_train
 
 
@@ -123,7 +137,12 @@ class OpenAICompatClient:
         self.seed = seed
         self.timeout = timeout
 
-    def infer(self, training: Sequence[Dict[str, Any]], target: List[List[int]], seed_offset: int = 0) -> CallResult:
+    def infer(
+        self,
+        training: Sequence[Dict[str, Any]],
+        target: List[List[int]],
+        seed_offset: int = 0,
+    ) -> CallResult:
         user = compact_prompt(training, target)
         body = {
             "model": self.model,
@@ -133,7 +152,7 @@ class OpenAICompatClient:
             ],
             "temperature": self.temperature,
             "seed": self.seed + seed_offset,
-            "max_tokens": 120,
+            "max_tokens": MAX_TOKENS,
             "response_format": RESPONSE_FORMAT,
         }
         payload = canonical_json(body).encode("utf-8")
@@ -167,6 +186,18 @@ class OpenAICompatClient:
         )
 
 
+def lock_status(text: str) -> Optional[str]:
+    """Return the unique LOCK_STATUS value from an exact standalone status line."""
+    values: List[str] = []
+    for line in text.splitlines():
+        m = re.fullmatch(r"\s*LOCK_STATUS:\s*([A-Z0-9_]+)\s*", line)
+        if m:
+            values.append(m.group(1))
+    if len(values) > 1:
+        raise ValueError("confirmatory lock contains multiple LOCK_STATUS lines")
+    return values[0] if values else None
+
+
 def assert_phase_allowed(phase: str) -> None:
     if phase != "eval":
         return
@@ -175,9 +206,18 @@ def assert_phase_allowed(phase: str) -> None:
             "SEALED: evaluation requires papers/01_agentic_bottleneck/"
             "STAGE004_CONFIRMATORY_LOCK_V1.md committed before first eval query"
         )
-    text = LOCK_FILE.read_text(encoding="utf-8")
-    if "LOCK_STATUS: LOCKED" not in text:
-        raise SystemExit("SEALED: confirmatory lock exists but is not marked LOCK_STATUS: LOCKED")
+    try:
+        status = lock_status(LOCK_FILE.read_text(encoding="utf-8"))
+    except ValueError as exc:
+        raise SystemExit(f"SEALED: invalid confirmatory lock: {exc}") from exc
+    if status != "LOCKED":
+        raise SystemExit("SEALED: confirmatory lock status line is not exactly LOCKED")
+
+
+def assert_eval_scope(phase: str, limit: Optional[int], only: Optional[Sequence[str]]) -> None:
+    """Confirmatory eval must address the entire sealed split; only deterministic resume may be partial."""
+    if phase == "eval" and (limit is not None or only):
+        raise SystemExit("SEALED: --limit and --only are development-only; eval always targets all sealed tasks")
 
 
 def participant_target(task: Dict[str, Any]) -> Dict[str, Any]:
@@ -189,7 +229,6 @@ def load_task(data_dir: Path, task_id: str) -> Dict[str, Any]:
     task = json.loads((data_dir / f"{task_id}.json").read_text(encoding="utf-8"))
     if not task.get("train") or not task.get("test"):
         raise ValueError(f"Malformed ARC task: {task_id}")
-    # Prove that the model-visible serialization cannot include the test output.
     visible = strip_test_outputs(task)
     if any("output" in x for x in visible["test"]):
         raise AssertionError("Leak guard failed")
@@ -198,12 +237,10 @@ def load_task(data_dir: Path, task_id: str) -> Dict[str, Any]:
 
 def run_task(client: OpenAICompatClient, task_id: str, task: Dict[str, Any]) -> Dict[str, Any]:
     # Production is aligned to the participant-visible CogARC target test[0].
-    # Extra original ARC test entries are neither sent to the model nor scored.
     target = participant_target(task)
     production = client.infer(task["train"], target["input"], seed_offset=0)
 
-    # Certificate call hides one training pair's output AND removes that pair entirely
-    # from the examples. Only its input is used as the certificate target.
+    # HDC hides one complete demonstration and uses only its input as the target.
     idx = hdc_index(task_id, len(task["train"]))
     cert_target = task["train"][idx]
     cert_training = [x for j, x in enumerate(task["train"]) if j != idx]
@@ -258,7 +295,62 @@ def summarize(rows: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
         "n_wrong_acts": wrong_acts,
         "hdc_pass_rate": sum(bool(r["hdc_correct"]) for r in rows) / n if n else None,
         "production_parse_rate": sum(bool(r["production_valid"]) for r in rows) / n if n else None,
+        "hdc_parse_rate": sum(bool(r["hdc_valid"]) for r in rows) / n if n else None,
     }
+
+
+def expected_row_contract(
+    phase: str,
+    model: str,
+    model_label: str,
+    temperature: float,
+    seed: int,
+) -> Dict[str, Any]:
+    return {
+        "phase": phase,
+        "model": model,
+        "model_label": model_label,
+        "temperature": temperature,
+        "seed": seed,
+        "participant_target_index": 0,
+        "max_tokens": MAX_TOKENS,
+        **contract_hashes(),
+    }
+
+
+def validate_resume_row(row: Dict[str, Any], expected: Dict[str, Any], allowed_task_ids: Sequence[str]) -> None:
+    if row.get("task_id") not in set(allowed_task_ids):
+        raise ValueError(f"resume row task outside fixed phase split: {row.get('task_id')}")
+    mismatches = {
+        key: (row.get(key), value)
+        for key, value in expected.items()
+        if row.get(key) != value
+    }
+    if mismatches:
+        parts = ", ".join(f"{k}: row={got!r} current={want!r}" for k, (got, want) in mismatches.items())
+        raise ValueError(f"resume provenance mismatch: {parts}")
+
+
+def load_resume_rows(
+    rows_file: Path,
+    expected: Dict[str, Any],
+    allowed_task_ids: Sequence[str],
+) -> List[Dict[str, Any]]:
+    if not rows_file.exists():
+        return []
+    rows: List[Dict[str, Any]] = []
+    seen = set()
+    for line_no, line in enumerate(rows_file.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip():
+            continue
+        row = json.loads(line)
+        validate_resume_row(row, expected, allowed_task_ids)
+        task_id = row["task_id"]
+        if task_id in seen:
+            raise ValueError(f"duplicate resume row for task {task_id} at line {line_no}")
+        seen.add(task_id)
+        rows.append(row)
+    return rows
 
 
 def main() -> int:
@@ -276,6 +368,8 @@ def main() -> int:
     args = ap.parse_args()
 
     assert_phase_allowed(args.phase)
+    assert_eval_scope(args.phase, args.limit, args.only)
+
     split = json.loads(SPLIT_FILE.read_text(encoding="utf-8"))
     key = "development_tasks" if args.phase == "dev" else "evaluation_tasks"
     allowed = list(split[key])
@@ -294,14 +388,20 @@ def main() -> int:
     summary_file = args.out_dir / f"{args.phase}_{args.model_label}_summary.json"
     client = OpenAICompatClient(args.base_url, args.model, args.temperature, args.seed)
 
-    rows: List[Dict[str, Any]] = []
-    # Resume deterministically without re-querying completed tasks.
-    if rows_file.exists():
-        for line in rows_file.read_text(encoding="utf-8").splitlines():
-            if line.strip():
-                rows.append(json.loads(line))
+    expected = expected_row_contract(
+        args.phase,
+        args.model,
+        args.model_label,
+        args.temperature,
+        args.seed,
+    )
+    try:
+        rows = load_resume_rows(rows_file, expected, allowed)
+    except (ValueError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"REFUSING RESUME: {exc}") from exc
     done = {r["task_id"] for r in rows}
 
+    hashes = contract_hashes()
     for i, task_id in enumerate(task_ids, 1):
         if task_id in done:
             continue
@@ -313,11 +413,8 @@ def main() -> int:
             "model_label": args.model_label,
             "temperature": args.temperature,
             "seed": args.seed,
-            "system_prompt_sha256": sha256_bytes(SYSTEM_PROMPT.encode("utf-8")),
-            "user_template_sha256": sha256_bytes(USER_TEMPLATE.encode("utf-8")),
-            "split_sha256": sha256_bytes(SPLIT_FILE.read_bytes()),
-            "response_format_sha256": sha256_bytes(canonical_json(RESPONSE_FORMAT).encode("utf-8")),
-            "max_tokens": 120,
+            **hashes,
+            "max_tokens": MAX_TOKENS,
         })
         with rows_file.open("a", encoding="utf-8") as fh:
             fh.write(canonical_json(row) + "\n")
@@ -339,11 +436,8 @@ def main() -> int:
         "temperature": args.temperature,
         "seed": args.seed,
         "task_ids": task_ids,
-        "split_sha256": sha256_bytes(SPLIT_FILE.read_bytes()),
-        "system_prompt_sha256": sha256_bytes(SYSTEM_PROMPT.encode("utf-8")),
-        "user_template_sha256": sha256_bytes(USER_TEMPLATE.encode("utf-8")),
-        "response_format_sha256": sha256_bytes(canonical_json(RESPONSE_FORMAT).encode("utf-8")),
-        "max_tokens": 120,
+        **hashes,
+        "max_tokens": MAX_TOKENS,
     })
     summary_file.write_text(json.dumps(summary, indent=2, sort_keys=True), encoding="utf-8")
     print(json.dumps(summary, indent=2, sort_keys=True))
