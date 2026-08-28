@@ -27,6 +27,26 @@ SOURCES = {
         "sha256": "e66ec93f15af34b27383f75e3ba58419b206e21dc3f2613ee53730cbc089697e",
         "path": "data/external/vaccaro2024/AnalysisScript_Final.Rmd",
     },
+    "himmelstein_study2_jas": {
+        "url": "https://osf.io/download/cjd39/",
+        "sha256": "1162176e18c8414d9b51f71cfd3b61fd4755c321d7d82725c050c3cad3abf77f",
+        "path": "data/external/himmelstein2023/Study_2_JAS_Data.csv",
+    },
+    "himmelstein_study2_demographics": {
+        "url": "https://osf.io/download/bxqkf/",
+        "sha256": "0e8bb7336c8f8252c04806f2ab745428202e0a6841d94746ec77d3e99814ede2",
+        "path": "data/external/himmelstein2023/Study_2_demographics_and_scales.csv",
+    },
+    "himmelstein_study2_codebook": {
+        "url": "https://osf.io/download/8y47b/",
+        "sha256": "c81c329baa9dcb83588ea47bfbf8c4730dcb1f65d009e9afa9ec166caa4d82ea",
+        "path": "data/external/himmelstein2023/Study_2_Codebook.xlsx",
+    },
+    "soleimanof_neufeld_2026": {
+        "url": "https://osf.io/download/d58vx/?view_only=0c9d07bac94d4a1089588f647db735a0",
+        "sha256": "660e35ae12c39823838ca2729b43362244cc9c8271aa543baa9ae9dc90d69388",
+        "path": "data/external/soleimanof_neufeld_2026/Dataset.xlsx",
+    },
 }
 
 
