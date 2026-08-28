@@ -1,0 +1,14 @@
+{
+  "source_rows_ai_advice": 17973,
+  "participants_ai_advice": 567,
+  "tasks": [
+    "art",
+    "census",
+    "cities",
+    "dermatology",
+    "sarcasm"
+  ],
+  "seeds": 100,
+  "minimum_conditioned_trials": 2,
+  "construct_warning": "baseline_train is task accuracy, not IQ"
+}
