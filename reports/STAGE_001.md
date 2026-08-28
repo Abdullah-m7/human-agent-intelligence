@@ -1,11 +1,11 @@
 # Stage 001 — Agentic Bottleneck Foundation & Open-Data Discovery
 
-Date: 2026-08-28  
+Date: 2026-08-28
 Branch: `stage-001-agentic-bottleneck-foundation`
 
 ## Controller decision
 
-**FOUNDATION: PASS**  
+**FOUNDATION: PASS**
 **PUBLICATION CLAIMS: HOLD**
 
 Stage 001 successfully turns the motivating question — *Does your IQ affect your agent?* — into a multi-paper research program with explicit construct rules, a falsifiable agentic model, reproducible open-data discovery analyses, and untouched validation candidates. It does **not** yet justify a paper-level causal claim about IQ, human intelligence, or autonomous agents.
