@@ -1,0 +1,9 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.cache/
+data/external/
+results/*.csv
+!results/*_summary.csv

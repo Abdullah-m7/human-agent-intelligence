@@ -1,0 +1,10 @@
+metric,estimate,se,p_value,ci_low,ci_high,note
+participant_CRT_vs_baseline_Brier_r,-0.41443976711585573,,1.7481750901970436e-08,,,"Lower Brier is better; this is an unaided task-performance association, not IQ."
+algorithm_final_Brier_CRT_z_itemFE,-0.013055189481369212,0.005947899734922575,0.028169030564198144,-0.024712858745472792,-0.0013975202172656319,"Exploratory. Final Brier conditional on initial-human Brier, advice Brier, and item fixed effects; SE clustered by participant."
+algorithm_final_Brier_CRT_z_domainFE,-0.013741006932468726,0.005965927251740181,0.02126492255701674,-0.025434009480265505,-0.002048004384671946,Exploratory robustness variant.
+algorithm_final_Brier_CRT_z_itemFE_agreement,-0.011835586591600018,0.005573839002243626,0.033718892367017396,-0.022760110291622192,-0.0009110628915778417,Exploratory robustness variant.
+algorithm_DWOA_CRT_z,0.018384197995879113,0.02063582386022852,0.3729895147739921,-0.022061273561481097,0.058829669553239324,Exploratory mean advice-weight association in valid DWOA cases.
+algorithm_DWOA_CRT_x_advice_advantage,0.01861425137363171,0.014770698719209097,0.20759192821619887,-0.010335786142510024,0.047564288889773446,Exploratory test of whether CRT changes sensitivity to relative advice quality.
+algorithm_final_Brier_CRT_z_LOO_min,-0.014617013319748316,,,,,Leave-one-item-out coefficient minimum; 15/15 coefficients negative.
+algorithm_final_Brier_CRT_z_LOO_max,-0.009963461272553771,,,,,Leave-one-item-out coefficient maximum; 15/15 coefficients negative.
+algorithm_final_Brier_CRT_z_participant_bootstrap,-0.012727067146893872,0.0060078617729880926,,-0.024770429001932565,-0.0024458055950307383,Participant-resampling percentile interval; 500 bootstrap draws.
