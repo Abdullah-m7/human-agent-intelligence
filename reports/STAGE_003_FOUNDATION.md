@@ -71,6 +71,8 @@ and ACT precision falls:
 
 `100% → 67.6%`.
 
+The corresponding **Unsafe Autonomy Mass**, `P(ACT ∧ wrong)`, rises from `0/75` to `12/75 = 16.0%`.
+
 Under the same cross-fitted ACT/DEFER policy, this makes the team worse despite making the machine better:
 
 - one-shot human joint performance: `75.69% → 67.68%`;
@@ -78,7 +80,7 @@ Under the same cross-fitted ACT/DEFER policy, this makes the team worse despite 
 
 Working construct:
 
-**Capability–Autonomy Gap** = improvement/expansion in machine capability or coverage that is not matched by reliability of the additional autonomous region.
+**Capability–Autonomy Gap** = a mismatch across agent states in which standalone capability improves but reliability of the additional autonomous region does not keep pace. It should be characterized with separate observables — standalone accuracy, ACT coverage, ACT precision, Unsafe Autonomy Mass, and joint performance — rather than collapsed into `coverage - accuracy`.
 
 The strong claim is not that adding detectors causes this universally. The publishable hypothesis is that **standalone capability and safe autonomous coverage are distinct axes, and optimizing the first can reduce joint-system performance when the second is miscalibrated.**
 

@@ -123,7 +123,7 @@ This registry separates **what a source actually measures** from what the progra
   - standalone accuracy: `26.7% → 33.3%`;
   - structural ACT coverage (`nfit>=1`): `26.7% → 49.3%`;
   - conditional ACT precision: `100% → 67.6%`;
-  - wrong autonomous acts at 321 detectors: `12/75`.
+  - wrong autonomous acts at 321 detectors: `12/75`, giving Unsafe Autonomy Mass `16.0%`.
 - Decision: **discovery instrument only**. Detector count is not treated as a universal model-scaling axis.
 
 ### Capability–Autonomy Gap discovery

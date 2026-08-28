@@ -41,7 +41,8 @@ Key benchmark objects include:
 
 - **Human Leverage:** joint performance minus agent-only performance;
 - **Human Leverage Gradient:** how strongly independent human capability changes joint value;
-- **Capability–Autonomy Gap:** the mismatch between standalone agent capability and reliability of the region the agent acts on autonomously;
+- **Unsafe Autonomy Mass:** `P(ACT ∧ wrong)`, the task mass exposed to incorrect autonomous action;
+- **Capability–Autonomy Gap:** a cross-state mismatch where standalone capability improves but the reliability of newly autonomous coverage does not keep pace;
 - **Recovery Value:** the extra system value produced by giving a deferred human a retry/recovery budget rather than treating deferral as an instantaneous handoff.
 
 See `benchmarks/capability_twin/README.md`.

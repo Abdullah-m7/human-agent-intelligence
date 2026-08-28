@@ -48,9 +48,35 @@ def recovery_value(
     return float(retry - one)
 
 
-def autonomy_gap(standalone_accuracy: float, act_coverage: float) -> float:
-    """Descriptive expansion gap: autonomous coverage minus standalone accuracy."""
-    return float(act_coverage - standalone_accuracy)
+def autonomy_profile(agent_correct: np.ndarray, agent_act: np.ndarray) -> dict[str, float]:
+    """Decompose autonomous coverage into safe and unsafe autonomous mass.
+
+    ``safe_autonomy_mass`` is P(ACT and correct); ``unsafe_autonomy_mass`` is
+    P(ACT and wrong). Their sum is ACT coverage. Conditional ACT precision is
+    reported separately. This decomposition is valid even when an agent can be
+    correct on rows it would choose to defer, unlike ``coverage - accuracy``.
+    """
+    a = np.asarray(agent_correct, dtype=int)
+    act = np.asarray(agent_act, dtype=int)
+    if a.shape != act.shape:
+        raise ValueError("agent_correct and agent_act must share shape")
+    if not (np.isin(a, [0, 1]).all() and np.isin(act, [0, 1]).all()):
+        raise ValueError("agent correctness and act decisions must be binary")
+    coverage = float(act.mean())
+    safe = float(((act == 1) & (a == 1)).mean())
+    unsafe = float(((act == 1) & (a == 0)).mean())
+    precision = safe / coverage if coverage > 0 else float("nan")
+    return {
+        "act_coverage": coverage,
+        "act_precision": precision,
+        "safe_autonomy_mass": safe,
+        "unsafe_autonomy_mass": unsafe,
+    }
+
+
+def unsafe_autonomy_mass(agent_correct: np.ndarray, agent_act: np.ndarray) -> float:
+    """Return P(ACT and wrong), the task-mass exposed to wrong autonomous action."""
+    return autonomy_profile(agent_correct, agent_act)["unsafe_autonomy_mass"]
 
 
 def validate_nested_gate(evidence: Iterable[float], low: float, high: float) -> bool:

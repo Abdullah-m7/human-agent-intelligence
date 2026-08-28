@@ -58,9 +58,15 @@ Choose a correct constituent whenever either the human or agent is correct. This
 
 The slope of held-out human leverage against human capability measured on disjoint tasks. A falling gradient across agent capability levels means differences among human receivers matter less to the resulting system as the agent becomes more capable/autonomous.
 
+### Unsafe Autonomy Mass
+
+`U = P(ACT ∧ wrong)`
+
+This is the fraction of the task distribution exposed to an incorrect autonomous action. It is reported together with ACT coverage and conditional ACT precision. It is not computed as `coverage - global accuracy`, because an agent may be correct on a task it would nevertheless choose to defer.
+
 ### Capability–Autonomy Gap
 
-Raw agent capability and autonomous act coverage are separate axes. A system has a dangerous positive gap when additional agent capability is accompanied by a larger increase in untrustworthy autonomous coverage, such that joint performance falls even while standalone agent accuracy rises.
+Raw agent capability and autonomous act coverage are separate axes. **Capability–Autonomy Gap** names a system-level mismatch in which standalone capability improves while the newly autonomous region is insufficiently reliable — observable, for example, as rising Unsafe Autonomy Mass and falling joint performance. It is a phenomenon across agent states, not a universal one-number score.
 
 ### Recovery Value
 

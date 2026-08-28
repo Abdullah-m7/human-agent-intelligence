@@ -1,7 +1,14 @@
 import unittest
 import numpy as np
 
-from src.capability_twin import autonomy_gap, human_leverage, recovery_value, routed_outcome, validate_nested_gate
+from src.capability_twin import (
+    autonomy_profile,
+    human_leverage,
+    recovery_value,
+    routed_outcome,
+    unsafe_autonomy_mass,
+    validate_nested_gate,
+)
 
 
 class CapabilityTwinTests(unittest.TestCase):
@@ -17,8 +24,27 @@ class CapabilityTwinTests(unittest.TestCase):
         a = np.array([1, 0, 0]); act = np.array([1, 0, 0]); h1 = np.array([1, 0, 1]); h3 = np.array([1, 1, 1])
         self.assertGreaterEqual(recovery_value(a, act, h1, h3), 0.0)
 
-    def test_autonomy_gap_separates_coverage_from_accuracy(self):
-        self.assertAlmostEqual(autonomy_gap(0.333333, 0.493333), 0.16, places=5)
+    def test_autonomy_profile_separates_safe_and_unsafe_mass(self):
+        a = np.array([1, 0, 1, 0])
+        act = np.array([1, 1, 0, 0])
+        profile = autonomy_profile(a, act)
+        self.assertAlmostEqual(profile["act_coverage"], 0.5)
+        self.assertAlmostEqual(profile["act_precision"], 0.5)
+        self.assertAlmostEqual(profile["safe_autonomy_mass"], 0.25)
+        self.assertAlmostEqual(profile["unsafe_autonomy_mass"], 0.25)
+        self.assertAlmostEqual(
+            profile["act_coverage"],
+            profile["safe_autonomy_mass"] + profile["unsafe_autonomy_mass"],
+        )
+        self.assertAlmostEqual(unsafe_autonomy_mass(a, act), 0.25)
+
+    def test_autonomy_profile_is_not_coverage_minus_global_accuracy(self):
+        # The agent is correct on a deferred row; global accuracy therefore cannot
+        # be subtracted from ACT coverage to obtain unsafe autonomous mass.
+        a = np.array([1, 0, 1, 0])
+        act = np.array([1, 1, 0, 0])
+        profile = autonomy_profile(a, act)
+        self.assertNotAlmostEqual(profile["unsafe_autonomy_mass"], act.mean() - a.mean())
 
     def test_stricter_gate_is_nested(self):
         self.assertTrue(validate_nested_gate([0, 1, 2, 5], 1, 2))
