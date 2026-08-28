@@ -9,11 +9,13 @@ on:
       - 'src/receiver_contract.py'
       - 'analysis/paper04_receiver_contract.py'
       - 'analysis/paper04_task_bootstrap.py'
+      - 'analysis/paper04_state_transition_bootstrap.py'
       - 'analysis/regenerate_stage003_task_states.py'
       - 'analysis/paper04_discovery_runner.py'
       - 'tests/test_receiver_contract.py'
       - 'tests/test_paper04_receiver_contract.py'
       - 'tests/test_paper04_task_bootstrap.py'
+      - 'tests/test_paper04_state_transition_bootstrap.py'
       - 'papers/04_receiver_competence/**'
       - '.github/workflows/paper04-qa.yml'
 
@@ -42,11 +44,13 @@ jobs:
             src/receiver_contract.py \
             analysis/paper04_receiver_contract.py \
             analysis/paper04_task_bootstrap.py \
+            analysis/paper04_state_transition_bootstrap.py \
             analysis/regenerate_stage003_task_states.py \
             analysis/paper04_discovery_runner.py \
             tests/test_receiver_contract.py \
             tests/test_paper04_receiver_contract.py \
-            tests/test_paper04_task_bootstrap.py
+            tests/test_paper04_task_bootstrap.py \
+            tests/test_paper04_state_transition_bootstrap.py
 
       - name: Run receiver-contract tests
         run: |
@@ -54,4 +58,5 @@ jobs:
             tests.test_receiver_contract \
             tests.test_paper04_receiver_contract \
             tests.test_paper04_task_bootstrap \
+            tests.test_paper04_state_transition_bootstrap \
             -v
