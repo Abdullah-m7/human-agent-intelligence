@@ -4,9 +4,9 @@ Date: 2026-08-29
 
 ## Controller conclusion
 
-The project must **not** claim novelty for separating agent capability from agent autonomy, for observing that human–AI teams can underperform their constituents, or for using abstention/deferral to control autonomous coverage. Those ideas have clear prior art.
+The project must **not** claim novelty for separating agent capability from agent autonomy, for observing that human–AI teams can underperform their constituents, for using abstention/deferral to control autonomous coverage, or for the generic statement that an optimal deferral policy depends on the receiving human expert. Those ideas have clear prior art.
 
-The defensible target is narrower: a task-matched, psychometrically grounded empirical test of whether an *improvement in standalone agent capability* can coincide with *an increase in unsafe autonomous task mass* and thereby *decrease human–agent joint performance*, under a precommitted ACT/DEFER rule.
+The defensible target is narrower: a task-matched, psychometrically grounded empirical test of whether an *improvement in standalone agent capability* can coincide with *an increase in unsafe autonomous task mass* and thereby *decrease human–agent joint performance*, under a precommitted ACT/DEFER rule. A second methodological contribution may be an explicit routing-transition decomposition on a dense real-human panel, but the algebra behind comparing model and expert value is not claimed as new theory.
 
 ## Closest prior art that constrains our claims
 
@@ -51,6 +51,21 @@ Examples:
 
 Thus the paper cannot sell the generic statement “a better AI can make a worse team” as an unqualified conceptual first.
 
+### 6. Expert-relative deferral is already central to Learning-to-Defer
+
+Learning-to-Defer (L2D) explicitly routes instances between a model and a human expert based on their relative capabilities. Prior work already models individual expert capability, adapts to changing or unseen experts, and learns to defer to a population of experts.
+
+Examples:
+
+- Hemmer et al., **Learning to Defer with Limited Expert Predictions**, AAAI 2023: https://doi.org/10.1609/aaai.v37i5.25742
+- Tailor et al., **Learning to Defer to a Population: A Meta-Learning Approach**, AISTATS 2024: https://proceedings.mlr.press/v238/tailor24a.html
+- Wei, Cao & Feng, **Exploiting Human-AI Dependence for Learning to Defer**, ICML 2024: https://proceedings.mlr.press/v235/wei24a.html
+- Strong et al., **Expert-Agnostic Learning to Defer** (2025): https://arxiv.org/abs/2502.10533
+
+Therefore we must **not** claim that “the appropriate autonomy level depends on which human receives the deferral” is itself new.
+
+What may be distinctive in this program is the empirical measurement regime: a dense panel of archived real humans solving the *same reasoning items* as executable agents, stable independent estimates of receiver capability, multiple receiver-effort contracts, and a cross-state decomposition showing exactly where a change in autonomous scope displaces human performance. The Stage-004 routing-transition identity is used as an auditable accounting tool, not advertised as a new Bayes-optimal deferral theorem.
+
 ## Narrow target contribution
 
 The Stage-004 target is an operational **cross-state inversion**, not a broad framework claim.
@@ -68,6 +83,23 @@ where:
 The scientific question is whether capability improvement is accompanied by a change in the *quality of the newly autonomous region* large enough to reverse the expected direction of joint-system performance.
 
 This is more specific than confidence miscalibration, selective prediction, or a generic human–AI complementarity claim because the unit of comparison is a preregistered change in agent state on the same task distribution, with an explicit autonomous-action policy and an archived human receiver measured on those same tasks.
+
+## Routing-transition decomposition
+
+For an archived human success rate `H`, agent correctness `C`, and ACT indicator `A`, joint correctness can be written as:
+
+`J = E[H] + E[A(C-H)]`.
+
+Stage 004 decomposes `ΔJ` between WEAK and STRONG into four routing-transition regions:
+
+1. both DEFER;
+2. both ACT;
+3. WEAK:DEFER → STRONG:ACT (**new strong autonomy**);
+4. WEAK:ACT → STRONG:DEFER (**strong retrenchment**).
+
+The contribution from region 3 is called the **autonomy displacement term** internally: on newly autonomous tasks, it measures whether STRONG replaces a human receiver with a better or worse expected outcome. This term is an exact descriptive accounting contribution, not a causal effect estimate and not claimed as an unprecedented theoretical identity.
+
+The value of including it is diagnostic: if an ATPI occurs, the project can state *where the team loss came from* instead of inferring a mechanism from aggregate accuracy alone.
 
 ## Naming recommendation
 
@@ -92,6 +124,8 @@ The **Human–Agent Capability Twin** benchmark design may remain independently 
 - separate ONE_SHOT and recovery-enabled receiver contracts;
 - standalone agent accuracy, ACT coverage, ACT precision, and Unsafe Autonomy Mass;
 - task-balanced and participant-weighted joint-system evaluation;
+- an outcome-blind executable model-selection rule;
+- exact routing-transition accounting for how additional autonomy displaces the human receiver;
 - a sealed evaluation protocol that prevents choosing the agent pair from the desired team outcome.
 
 This benchmark contribution should be evaluated separately from whether the Stage-003 inversion generalizes.
