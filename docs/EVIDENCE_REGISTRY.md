@@ -64,3 +64,19 @@ This registry separates **what a source actually measures** from what the progra
 5. Advice resistance is not automatically verification skill. A person who rejects both correct and incorrect advice can show high resistance without high discrimination.
 6. A CRT score is a direct measure of **cognitive reflection**, not an IQ score and not a general-intelligence estimate.
 7. The label `IQ` is reserved for data containing a defensible IQ/general-cognitive-ability instrument; no Stage 001 dataset currently satisfies that requirement.
+
+## Stage 002 additions
+
+### He, Buijsman & Gadiraju — CSCW 2023
+
+- Paper DOI: `10.1145/3610067`
+- Open-data DOI: `10.4121/F211863D-331B-44E5-A184-C21A18AC831A`
+- Main-study sample reconstructed using authors' released exclusion logic: `281` participants × `10` trials = `2,810` trials.
+- Conditions: system `87`, accuracy `92`, analogy `102`.
+- Locked validation commit: `a51913e1920b5a45aaeea9f3dbb50afb6688a426`.
+- Analysis-plan executable committed before focal coefficients: `811d3755a02c2aa561bc4af74ec8c15559c62d86`.
+- Validation verdict: **TWO_SIDED_SUSCEPTIBILITY_NOT_SUPPORTED**.
+- H1 helpful capability coefficient: `+0.0647`, p `0.3597`.
+- H2 harmful capability coefficient: `-0.0080`, p `0.9497`.
+- Post-validation measurement diagnostic: mean split-half Spearman–Brown reliability of the 10-item capability construct ≈ `0.08`; LOTO capability did not predict focal initial correctness (`p≈0.50`).
+- Interpretive rule: failed validation remains failed; low reliability is a diagnostic and a design requirement for V2, not a retroactive exclusion.

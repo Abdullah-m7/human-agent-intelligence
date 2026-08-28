@@ -7,3 +7,5 @@ __pycache__/
 data/external/
 results/*.csv
 !results/*_summary.csv
+
+results/*_raw/
