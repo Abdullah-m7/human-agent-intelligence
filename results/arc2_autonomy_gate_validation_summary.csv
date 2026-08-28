@@ -1,0 +1,14 @@
+metric,value,n,note
+locked_metadata,,120,lock=a89dc690e5eab6dba1ddbc2985859a71e181650f; solver=e151937e34c8b34f953833a0dab75797fc737ba4; arc2=f3283f727488ad98fe575ea6a5ac981e4a188e49
+standalone_accuracy,0.016666666666666666,120,all evaluation tasks
+precision_nfit_eq_1,0.07142857142857142,14,primary comparator
+precision_nfit_ge_2,0.25,4,locked redundancy group
+precision_difference,0.17857142857142858,18,nfit>=2 minus nfit==1
+fisher_one_sided_p,0.4052287581699347,18,odds=4.333333333333333
+coverage_nfit_ge_1,0.15,18,all 120 tasks denominator
+act_precision_nfit_ge_1,0.1111111111111111,18,conditional on ACT
+wrong_act_rate_all_nfit_ge_1,0.13333333333333333,16,wrong autonomous acts / 120
+coverage_nfit_ge_2,0.03333333333333333,4,all 120 tasks denominator
+act_precision_nfit_ge_2,0.25,4,conditional on ACT
+wrong_act_rate_all_nfit_ge_2,0.025,3,wrong autonomous acts / 120
+verdict,,4,INCONCLUSIVE_LOW_COVERAGE
