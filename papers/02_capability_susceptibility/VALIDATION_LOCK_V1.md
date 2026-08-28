@@ -1,7 +1,7 @@
 # Validation Lock V1 — Capability-Dependent Susceptibility
 
-Locked: 2026-08-28  
-Stage: 002  
+Locked: 2026-08-28
+Stage: 002
 Status: **LOCKED BEFORE FOCAL RAW-DATA INSPECTION**
 
 ## 1. Validation dataset
