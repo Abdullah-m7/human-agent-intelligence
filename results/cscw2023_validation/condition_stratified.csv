@@ -1,0 +1,7 @@
+analysis,term,estimate,se,p_value,ci_low,ci_high,n_trials,n_participants,note,condition,target,eligible
+condition_accuracy_helpful,capability_z,0.10077647717944971,0.12794509195708118,0.43089905646366966,-0.14999129505509473,0.35154424941399415,362,92,condition-stratified robustness,accuracy,helpful,True
+condition_accuracy_harmful,capability_z,0.07064567916475986,0.22571257341515016,0.7542885934524151,-0.37174283558678733,0.513034193916307,126,75,condition-stratified robustness,accuracy,harmful,True
+condition_analogy_helpful,capability_z,0.10087389709225547,0.10658823636070362,0.3439503924080415,-0.10803520735036626,0.3097830015348772,428,102,condition-stratified robustness,analogy,helpful,True
+condition_analogy_harmful,capability_z,0.07785173084002252,0.20553646138545334,0.7048561904969737,-0.3249923309852736,0.4806957926653186,116,79,condition-stratified robustness,analogy,harmful,True
+condition_system_helpful,capability_z,-0.03170572676035879,0.14894372899640118,0.8314279689610365,-0.3236300713163992,0.2602186177956817,328,87,condition-stratified robustness,system,helpful,True
+condition_system_harmful,capability_z,-0.25713176253145065,0.2817727624591082,0.36147920876904094,-0.8093962287756625,0.29513270371276124,105,73,condition-stratified robustness,system,harmful,True
