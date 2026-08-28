@@ -6,7 +6,7 @@ Date initialized: 2026-08-29
 
 ## Purpose
 
-This file is intentionally present in a non-LOCKED state. `analysis/stage004_llm_hdc.py` refuses all `--phase eval` requests unless this exact file contains `LOCK_STATUS: LOCKED`. Therefore the 60-task evaluation split remains technically sealed while development model selection is unresolved.
+This file is intentionally present in a non-locked state. `analysis/stage004_llm_hdc.py` must refuse all `--phase eval` requests until the status line itself is deliberately changed to the exact locked marker in a later commit. Therefore the 60-task evaluation split remains technically sealed while development model selection is unresolved.
 
 ## Governing selection rule
 
@@ -47,7 +47,7 @@ Unless this document is version-bumped before any evaluation query, the confirma
 - primary weighting: task-balanced;
 - secondary weighting: participant-weighted.
 
-Prompt bytes, split bytes, runner commit, and exact llama.cpp/model provenance must be recorded below before `LOCK_STATUS` can change to `LOCKED`.
+Prompt bytes, split bytes, runner commit, and exact llama.cpp/model provenance must be recorded below before the status may be changed from draft to locked.
 
 ## Evaluation eligibility
 
@@ -78,7 +78,7 @@ Report without changing the primary verdict:
 - HDC pass conditional on correct vs wrong production;
 - latency and token-cost diagnostics.
 
-## Fields required before LOCKED
+## Fields required before locked status
 
 `SELECTION_RULE_COMMIT: cc3be19c67eb88b9a1d053939a01690423e04463`
 
