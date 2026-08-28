@@ -24,6 +24,8 @@ For production inference the model receives only:
 
 The test output is never serialized into the model request.
 
+**CogARC target alignment:** the participant-visible behavioral target is source `test[0]`. Two raw ARC task files retain a second original test query (`6ea4a07e`, `d5d6de2d`), but CogARC Success grids/submissions correspond to `test[0]`; those extra queries are excluded from both agent scoring and Human↔Agent comparison.
+
 For the autonomy certificate, a training pair is selected by:
 
 `index = int(sha256(task_id), 16) mod n_training_pairs`.
