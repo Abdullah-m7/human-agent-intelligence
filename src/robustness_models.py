@@ -1,11 +1,7 @@
 """Alternative Stage-002 models for the Agentic Bottleneck paper.
 
 These models are designed to test whether Stage-001 role-migration patterns are
-artifacts of two simplifying assumptions:
-
-1. independence between human and agent task errors; and
-2. random human gating rather than confidence-selective review.
-
+artifacts of simplifying assumptions about correlated errors and review routing.
 They remain system-level computational models. No parameter is an IQ score and
 no output should be interpreted as a prevalence estimate for real humans.
 """
@@ -27,7 +23,8 @@ def bernoulli_joint(
 
     ``requested_corr`` is converted to a candidate P(A=1,H=1) and projected to
     the Fréchet bounds when the requested correlation is infeasible for the
-    supplied marginals. The final element is the realized correlation.
+    supplied marginals. The final element is the realized correlation; callers
+    must report projection/clipping rather than pretending the request was met.
     """
     pa = min(1.0, max(0.0, p_agent))
     ph = min(1.0, max(0.0, p_human))
@@ -51,9 +48,6 @@ def correlated_gated_accuracy(p: Params, error_corr: float) -> float:
     """Expected correctness of human gating with correlated human/agent errors."""
     a = effective_agent(p)
     p11, _, p01, _, _ = bernoulli_joint(a, p.human, error_corr)
-    # Correct agent output is preserved with specificity Q. If falsely rejected,
-    # the fallback is correct only in the A-correct/H-correct joint state.
-    # Wrong agent output is rescued only when detected and the human is correct.
     return a * p.specificity + (1.0 - p.specificity) * p11 + p.verification * p01
 
 
@@ -88,7 +82,8 @@ class SelectiveReviewParams:
     specificity: float
     review_threshold: float
     beta_spec: float = 0.20
-    difficulty_scale: float = 1.20
+    agent_difficulty_scale: float = 1.20
+    human_difficulty_scale: float = 1.20
     review_sharpness: float = 35.0
     difficulty_points: int = 101
 
@@ -110,21 +105,21 @@ def _sigmoid(x: np.ndarray) -> np.ndarray:
 def selective_profile(p: SelectiveReviewParams) -> dict[str, float]:
     """Average accuracy/autonomy under difficulty-sensitive selective review.
 
-    The agent and human face the same evenly weighted latent difficulty grid.
-    The review policy is calibrated to the agent's probability of being correct:
-    lower-confidence items are more likely to be reviewed. This creates an
-    endogenous autonomy rate rather than mixing review and autonomy at random.
+    Human and agent face the same evenly weighted latent difficulty coordinate,
+    but their difficulty slopes may differ. Allowing unequal slopes is critical:
+    if both slopes are forced equal, their relative advantage can become nearly
+    invariant across difficulty, making the sign of review benefit artificially
+    insensitive to the review threshold.
     """
     base_agent = _clip_probability(
         p.agent + p.beta_spec * (p.specification - 0.5)
     )
     base_human = _clip_probability(p.human)
     difficulty = np.linspace(-1.0, 1.0, p.difficulty_points)
-    pa = _sigmoid(_logit(base_agent) - p.difficulty_scale * difficulty)
-    ph = _sigmoid(_logit(base_human) - p.difficulty_scale * difficulty)
+    pa = _sigmoid(_logit(base_agent) - p.agent_difficulty_scale * difficulty)
+    ph = _sigmoid(_logit(base_human) - p.human_difficulty_scale * difficulty)
 
-    # A smooth threshold prevents finite-difference sensitivities from being
-    # dominated by discontinuous routing changes at one exact confidence value.
+    # Smooth confidence routing avoids a discontinuous finite-difference artifact.
     review_prob = _sigmoid(
         p.review_sharpness * (p.review_threshold - pa)
     )
@@ -137,7 +132,9 @@ def selective_profile(p: SelectiveReviewParams) -> dict[str, float]:
         "effective_autonomy": float(np.mean(1.0 - review_prob)),
         "mean_agent_accuracy": float(np.mean(pa)),
         "mean_human_accuracy": float(np.mean(ph)),
-        "mean_reviewed_accuracy": float(np.sum(review_prob * gate) / max(np.sum(review_prob), 1e-12)),
+        "mean_reviewed_accuracy": float(
+            np.sum(review_prob * gate) / max(np.sum(review_prob), 1e-12)
+        ),
         "review_fraction": float(np.mean(review_prob)),
     }
 
