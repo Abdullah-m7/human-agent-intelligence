@@ -23,7 +23,7 @@ The program asks which partial derivative dominates under which regime, rather t
 
 ## 2. Core theoretical claim to test
 
-**Role Migration Hypothesis**: increasing agent autonomy does not necessarily remove the human bottleneck. It can reduce the importance of human execution/fallback ability while preserving or increasing the relative importance of upstream specification quality and downstream verification.
+**Role Migration Hypothesis**: increasing agent autonomy need not remove the human bottleneck; it can change *where* human capability enters the system. Routine execution and continuous review may attenuate as autonomy rises, while upstream specification can remain influential because it shapes the objective before autonomous action begins. Verification remains important where review, auditing, escalation, or exception-handling gates still exist.
 
 This differs from a generic equalizer/amplifier claim. The unit of analysis is an **agentic workflow with varying autonomy**, not merely a human receiving one-shot AI advice.
 
@@ -56,9 +56,9 @@ Never infer IQ from prompt quality, language fluency, occupation, education, AI 
 
 ## 5. Falsifiability
 
-The role-migration hypothesis fails if, over broad plausible regimes, increasing autonomy uniformly makes all human-side dimensions irrelevant, or if specification/verification sensitivity does not persist after execution/fallback influence declines.
+The role-migration hypothesis fails if, across alternative defensible models and real agentic tasks, increasing autonomy makes upstream specification no more consequential than execution/fallback capability or if the apparent migration is only an artifact of the chosen equations.
 
-The empirical capability-gradient hypothesis fails if open human datasets show no reproducible association between pre-AI baseline capability and AI treatment gain after accounting for ceiling effects, task difficulty, and measurement error.
+The empirical capability-gradient hypothesis fails if open human datasets show no reproducible association between independently measured pre-AI task capability and AI treatment gain after accounting for ceiling effects, task difficulty, measurement error, and advice quality.
 
 ## 6. Novelty boundary as of 2026-08-28
 
@@ -71,16 +71,19 @@ Existing work already establishes several nearby results:
 - Bigoni et al. (arXiv, 2025) explicitly framed AI as an equalizer vs amplifier of cognitive differences.
 - Riedl & Weidmann (PsyArXiv, v3 2026) separated individual ability from collaborative ability and found Theory of Mind predictive of AI collaboration.
 - Ming (arXiv, 2026) reported a forecasting pilot in which collaborative traits, not raw cognitive ability, distinguished high-performing human–AI modes.
+- Mitchell, Ghosh & Passi (arXiv:2608.23642, 2026) argue that current agent design can undermine the cognitive capacities required for meaningful human oversight.
+- Singh et al. / Data & Society (The Oversight Fallacy, 2026) emphasize that a nominal human-in-the-loop is insufficient when people cannot recognize agent mistakes early enough to intervene.
+- Anthropic (2026) reports real-world variation in agent autonomy and longer autonomous work intervals, reinforcing the need to treat autonomy as an empirical system dimension rather than a binary label.
 
-Therefore this repository will **not** claim novelty for the generic proposition that lower-skill users can benefit more from AI, nor for the phrase 'equalizer or amplifier'. The intended contribution is the transition from static assistance to **autonomy-dependent human bottlenecks in agentic systems**, plus a disciplined synthesis of which human capability matters at each autonomy regime.
+Therefore this repository will **not** claim novelty for the generic proposition that lower-skill users can benefit more from AI, for the phrase 'equalizer or amplifier', or for the generic warning that human oversight can fail. The intended contribution is to quantify **autonomy-dependent reweighting of human capabilities** and to connect task capability with both beneficial and harmful susceptibility to AI influence using defensible secondary data.
 
 ## 7. Publication architecture
 
-Paper 01 develops and stress-tests the agentic bottleneck model.
+Paper 01 develops the agentic bottleneck model, stress-tests it against alternative assumptions, and then tests its autonomy predictions on real agentic tasks without human recruitment.
 
-Paper 02 performs a secondary-data capability-gradient synthesis, with ceiling-effect correction and construct taxonomy.
+Paper 02 uses open individual-level human–AI data to study **capability-dependent susceptibility**: whether higher task capability changes uptake of correct AI advice, harmful switching to incorrect advice, and net performance gain. The Stage 001 HAIID analysis is a feasibility signal, not a final confirmatory result.
 
-Paper 03 isolates verification as a ceiling on safe joint performance.
+Paper 03 isolates the **verification ceiling**: when oversight becomes harmful, when it rescues agent errors, and how those regimes change with agent capability and error correlation.
 
 Paper 04 connects the program to deferral: an agent should not defer merely because a human exists; the receiver's competence must dominate the relevant residual risk.
 
