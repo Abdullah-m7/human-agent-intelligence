@@ -2,12 +2,13 @@
 
 Two alternative models are evaluated:
 
-1. correlated human/agent correctness, using a valid Bernoulli joint model; and
-2. confidence-selective review over a latent task-difficulty distribution.
+1. correlated human/agent correctness, with infeasible requested correlations
+   projected to valid Bernoulli Fréchet bounds and projection rates reported;
+2. confidence-selective review over latent task difficulty, including matched
+   and asymmetric human/agent difficulty-response regimes.
 
-The purpose is to test whether the Stage-001 role-migration pattern survives
-when its strongest simplifying assumptions are relaxed. Results remain
-computational and should not be interpreted as empirical human prevalence.
+The purpose is to test whether Stage-001 role migration survives relaxed
+assumptions. Results remain computational, not empirical human prevalence.
 """
 
 from __future__ import annotations
@@ -53,6 +54,7 @@ def correlated_rows() -> pd.DataFrame:
                 {
                     "requested_corr": requested_corr,
                     "realized_corr": realized_corr,
+                    "corr_projected": float(abs(realized_corr - requested_corr) > 1e-8),
                     "agent": p.agent,
                     "human": p.human,
                     "specification": p.specification,
@@ -80,58 +82,84 @@ def selective_rows() -> pd.DataFrame:
         "specificity": [0.70, 0.85, 0.95],
         "review_threshold": [0.55, 0.65, 0.75, 0.85, 0.95],
     }
+    regimes = {
+        "matched": (1.20, 1.20),
+        "agent_steeper": (1.60, 0.80),
+        "human_steeper": (0.80, 1.60),
+    }
     keys = list(grid)
-    records: list[dict[str, float]] = []
-    for values in itertools.product(*(grid[key] for key in keys)):
-        p = SelectiveReviewParams(**dict(zip(keys, values)))
-        profile = selective_profile(p)
-        sens = {
-            field: selective_sensitivity(p, field)
-            for field in ("human", "specification", "verification", "specificity")
-        }
-        shares = selective_sensitivity_shares(p)
-        records.append(
-            {
-                **{key: getattr(p, key) for key in keys},
-                **profile,
-                "review_gain_vs_no_review": profile["joint_accuracy"] - profile["mean_agent_accuracy"],
-                "dJ_d_human": sens["human"],
-                "dJ_d_specification": sens["specification"],
-                "dJ_d_verification": sens["verification"],
-                "dJ_d_specificity": sens["specificity"],
-                "share_specification": shares["specification"],
+    records: list[dict[str, object]] = []
+    for regime, (agent_scale, human_scale) in regimes.items():
+        for values in itertools.product(*(grid[key] for key in keys)):
+            base = dict(zip(keys, values))
+            p = SelectiveReviewParams(
+                **base,
+                agent_difficulty_scale=agent_scale,
+                human_difficulty_scale=human_scale,
+            )
+            profile = selective_profile(p)
+            sens = {
+                field: selective_sensitivity(p, field)
+                for field in ("human", "specification", "verification", "specificity")
             }
-        )
+            shares = selective_sensitivity_shares(p)
+            records.append(
+                {
+                    **base,
+                    "difficulty_regime": regime,
+                    "agent_difficulty_scale": agent_scale,
+                    "human_difficulty_scale": human_scale,
+                    **profile,
+                    "review_gain_vs_no_review": profile["joint_accuracy"] - profile["mean_agent_accuracy"],
+                    "dJ_d_human": sens["human"],
+                    "dJ_d_specification": sens["specification"],
+                    "dJ_d_verification": sens["verification"],
+                    "dJ_d_specificity": sens["specificity"],
+                    "share_specification": shares["specification"],
+                }
+            )
     return pd.DataFrame(records)
+
+
+def _base_summary_row() -> dict[str, float]:
+    return {
+        "median_realized_corr": float("nan"),
+        "corr_projection_fraction": float("nan"),
+        "review_harm_fraction": float("nan"),
+        "review_sign_change_fraction": float("nan"),
+    }
 
 
 def summarize_correlated(df: pd.DataFrame) -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for corr, corr_frame in df.groupby("requested_corr"):
+        projection_fraction = float(corr_frame.corr_projected.mean())
         for autonomy, group in corr_frame.groupby("autonomy"):
             rows.append(
                 {
+                    **_base_summary_row(),
                     "model": "correlated_errors",
                     "setting": f"corr={corr:+.2f};autonomy={autonomy:.2f}",
                     "n": len(group),
                     "median_effective_autonomy": autonomy,
                     "median_realized_corr": float(group.realized_corr.median()),
+                    "corr_projection_fraction": projection_fraction,
                     "median_abs_dJ_dH": float(group.dJ_d_human.abs().median()),
                     "median_abs_dJ_dV": float(group.dJ_d_verification.abs().median()),
                     "median_abs_dJ_dS": float(group.dJ_d_specification.abs().median()),
                     "median_specification_share": float(group.share_specification.median()),
-                    "review_harm_fraction": float("nan"),
                 }
             )
-        # Gating gain is independent of alpha; retain one alpha slice.
         unique = corr_frame[corr_frame.autonomy == 0.0]
         rows.append(
             {
+                **_base_summary_row(),
                 "model": "correlated_errors",
                 "setting": f"corr={corr:+.2f};gating_harm",
                 "n": len(unique),
                 "median_effective_autonomy": float("nan"),
                 "median_realized_corr": float(unique.realized_corr.median()),
+                "corr_projection_fraction": float(unique.corr_projected.mean()),
                 "median_abs_dJ_dH": float("nan"),
                 "median_abs_dJ_dV": float("nan"),
                 "median_abs_dJ_dS": float("nan"),
@@ -144,21 +172,33 @@ def summarize_correlated(df: pd.DataFrame) -> list[dict[str, object]]:
 
 def summarize_selective(df: pd.DataFrame) -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
-    for threshold, group in df.groupby("review_threshold"):
-        rows.append(
-            {
-                "model": "selective_review",
-                "setting": f"threshold={threshold:.2f}",
-                "n": len(group),
-                "median_effective_autonomy": float(group.effective_autonomy.median()),
-                "median_realized_corr": float("nan"),
-                "median_abs_dJ_dH": float(group.dJ_d_human.abs().median()),
-                "median_abs_dJ_dV": float(group.dJ_d_verification.abs().median()),
-                "median_abs_dJ_dS": float(group.dJ_d_specification.abs().median()),
-                "median_specification_share": float(group.share_specification.median()),
-                "review_harm_fraction": float((group.review_gain_vs_no_review < 0).mean()),
-            }
+    config_keys = ["agent", "human", "specification", "verification", "specificity"]
+    for regime, regime_frame in df.groupby("difficulty_regime"):
+        pivot = regime_frame.pivot_table(
+            index=config_keys,
+            columns="review_threshold",
+            values="review_gain_vs_no_review",
         )
+        signs = np.sign(pivot)
+        sign_change_fraction = float(
+            ((signs.max(axis=1) > 0) & (signs.min(axis=1) < 0)).mean()
+        )
+        for threshold, group in regime_frame.groupby("review_threshold"):
+            rows.append(
+                {
+                    **_base_summary_row(),
+                    "model": "selective_review",
+                    "setting": f"regime={regime};threshold={threshold:.2f}",
+                    "n": len(group),
+                    "median_effective_autonomy": float(group.effective_autonomy.median()),
+                    "median_abs_dJ_dH": float(group.dJ_d_human.abs().median()),
+                    "median_abs_dJ_dV": float(group.dJ_d_verification.abs().median()),
+                    "median_abs_dJ_dS": float(group.dJ_d_specification.abs().median()),
+                    "median_specification_share": float(group.share_specification.median()),
+                    "review_harm_fraction": float((group.review_gain_vs_no_review < 0).mean()),
+                    "review_sign_change_fraction": sign_change_fraction,
+                }
+            )
     return rows
 
 
