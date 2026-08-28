@@ -8,7 +8,7 @@ The program studies human–agent systems as joint cognitive systems rather than
 
 ## Core shift
 
-The motivating phrase — *Does your IQ affect your agent?* — is intentionally sharper than the scientific construct. We do **not** infer IQ from prompts, writing style, education, or observed AI use. `IQ / cognitive ability` is used only when a source dataset measured it directly with a defensible instrument. Otherwise we use narrower constructs such as baseline task ability, expertise, metacognitive calibration, verification skill, or interaction strategy.
+The motivating phrase — *Does your IQ affect your agent?* — is intentionally sharper than the scientific construct. We do **not** infer IQ from prompts, writing style, education, or observed AI use. `IQ / general cognitive ability` is used only when a source dataset measured it directly with a defensible instrument. Otherwise we use narrower constructs such as baseline task ability, expertise, cognitive reflection, metacognitive calibration, verification skill, or interaction strategy.
 
 ## Program questions
 
@@ -34,21 +34,22 @@ Synthetic users or LLM personas are never treated as evidence about real human I
 
 | Paper | Working title | Primary evidence | New participants? |
 |---|---|---|---|
-| 01 | **The Agentic Bottleneck: How Autonomy Repositions the Human Contribution** | formal model + computational experiment | No |
-| 02 | **Capability Gradients in Human–AI Augmentation** | secondary-data meta-analysis | No |
+| 01 | **The Agentic Bottleneck: How Autonomy Repositions the Human Contribution** | formal model + computational stress tests + agent benchmarks | No |
+| 02 | **Capability-Dependent Susceptibility: Decomposing AI Augmentation into Helpful and Harmful Influence** | secondary individual-level datasets + independent validation | No |
 | 03 | **The Verification Ceiling** | open interaction datasets + computational model | No |
 | 04 | **Who Should Receive the Deferral?** | formal decision model + public benchmarks | No |
 | 05 | **From Solo Ability to Collaborative Ability** | secondary re-analysis of suitable open datasets | No |
-| 06 | **Does Your IQ Affect Your Agent?** | reserved for datasets with direct cognitive measurement | Not necessarily |
+| 06 | **Does Your IQ Affect Your Agent?** | reserved for data with a direct IQ/general-cognitive-ability instrument | Not necessarily |
 
 ## Stage 001
 
-Stage 001 establishes the novelty boundary, formalizes Paper 01, creates an evidence registry, and implements the first falsifiable simulation. See `reports/STAGE_001.md` and `papers/01_agentic_bottleneck/PROTOCOL.md`.
+Stage 001 establishes the novelty boundary, formalizes Paper 01, audits open datasets, and runs the first reproducible discovery analyses. See `reports/STAGE_001.md`, `papers/01_agentic_bottleneck/PROTOCOL.md`, and `papers/02_capability_susceptibility/PROTOCOL.md`.
 
 ## Repository principles
 
 - Separate measured constructs from proxies.
 - Separate computational demonstrations from claims about human psychology.
+- Distinguish discovery analyses from untouched validation.
 - Prefer preregisterable hypotheses and reproducible code.
 - Track source licensing and data availability before analysis.
 - Treat the repository as the canonical record of project state.
