@@ -152,3 +152,40 @@ It also says nothing about IQ. `Capability_LOTO` is task-specific unaided accura
 ## Next scientific gate
 
 Before another validation attempt, perform a clearly labeled post-validation diagnostic comparing measurement reliability and experimental structure across HAIID and CSCW. A new independent dataset may be used only after a revised hypothesis is explicitly locked in a new validation protocol.
+
+## Post-validation diagnostic — measurement reliability
+
+This section was conceived and executed **after** the locked primary validation failed. It is exploratory and does not alter the registered failure classification.
+
+A common-item split-half diagnostic compared the stability of initial unaided task performance in HAIID and CSCW across 500 random item splits.
+
+### HAIID AI-advice subset
+
+- 567 participants
+- 17,973 trials
+- median 32 trials per participant (range 24–32)
+- five task domains
+- mean split-half correlation after task-centering: `r = 0.3607`
+- mean Spearman–Brown adjusted reliability: `0.5294`
+
+### CSCW 2023
+
+- 281 participants
+- 2,810 trials
+- exactly 10 trials per participant
+- mean raw split-half correlation: `r = 0.0464`
+- mean raw Spearman–Brown adjusted reliability: `0.0803`
+- mean condition-centered split-half correlation: `r = 0.0362`
+- mean condition-centered Spearman–Brown reliability: `0.0616`
+
+The registered LOTO capability measure also failed a basic predictive-validity diagnostic in CSCW. In a binomial model of focal **initial** correctness with item and condition fixed effects and participant-clustered SEs:
+
+- capability coefficient: `+0.0406` log-odds per 1 SD
+- 95% CI: `[-0.0779, +0.1591]`
+- p: `0.5019`
+
+Thus, the CSCW task contains very little stable between-person signal in the particular 10-item unaided-accuracy construct used by Validation V1.
+
+### Interpretation constraint
+
+This diagnostic **does not retroactively make the dataset ineligible**; the lock did not specify a reliability threshold, and the primary validation remains failed. It does, however, change the design requirement for Validation V2: the next dataset must have a demonstrably stable capability measure, preferably a direct psychometric/cognitive measure or a substantially larger unaided item battery whose reliability can be established independently of AI-use outcomes.
