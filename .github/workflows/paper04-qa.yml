@@ -1,0 +1,62 @@
+name: Paper 04 Receiver Contract QA
+
+on:
+  push:
+    branches:
+      - paper-04-receiver-contract
+  pull_request:
+    paths:
+      - 'src/receiver_contract.py'
+      - 'analysis/paper04_receiver_contract.py'
+      - 'analysis/paper04_task_bootstrap.py'
+      - 'analysis/paper04_state_transition_bootstrap.py'
+      - 'analysis/regenerate_stage003_task_states.py'
+      - 'analysis/paper04_discovery_runner.py'
+      - 'tests/test_receiver_contract.py'
+      - 'tests/test_paper04_receiver_contract.py'
+      - 'tests/test_paper04_task_bootstrap.py'
+      - 'tests/test_paper04_state_transition_bootstrap.py'
+      - 'papers/04_receiver_competence/**'
+      - '.github/workflows/paper04-qa.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  receiver-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Inspect runner Python
+        run: |
+          python3 --version
+          python3 -m pip --version
+
+      - name: Install analysis dependencies
+        run: python3 -m pip install -r requirements-analysis.txt
+
+      - name: Compile receiver-contract code
+        run: |
+          python3 -m py_compile \
+            src/receiver_contract.py \
+            analysis/paper04_receiver_contract.py \
+            analysis/paper04_task_bootstrap.py \
+            analysis/paper04_state_transition_bootstrap.py \
+            analysis/regenerate_stage003_task_states.py \
+            analysis/paper04_discovery_runner.py \
+            tests/test_receiver_contract.py \
+            tests/test_paper04_receiver_contract.py \
+            tests/test_paper04_task_bootstrap.py \
+            tests/test_paper04_state_transition_bootstrap.py
+
+      - name: Run receiver-contract tests
+        run: |
+          python3 -m unittest \
+            tests.test_receiver_contract \
+            tests.test_paper04_receiver_contract \
+            tests.test_paper04_task_bootstrap \
+            tests.test_paper04_state_transition_bootstrap \
+            -v

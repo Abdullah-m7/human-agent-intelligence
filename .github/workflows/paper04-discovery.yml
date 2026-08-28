@@ -1,0 +1,164 @@
+name: Paper 04 Independent Discovery
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - paper-04-receiver-contract
+    paths:
+      - 'analysis/regenerate_stage003_task_states.py'
+      - 'analysis/paper04_receiver_contract.py'
+      - 'analysis/paper04_task_bootstrap.py'
+      - 'analysis/paper04_state_transition_bootstrap.py'
+      - 'analysis/paper04_discovery_runner.py'
+      - 'src/receiver_contract.py'
+      - '.github/workflows/paper04-discovery.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  pinned-public-data-replication:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      COGARC_SHA: 1a319935b803580fcbd6ff002195df86a7e90095
+      SOLVER_SHA: e151937e34c8b34f953833a0dab75797fc737ba4
+      OUT_DIR: results/paper04_discovery
+    steps:
+      - name: Checkout research program
+        uses: actions/checkout@v4
+
+      - name: Inspect runtime
+        run: |
+          set -euxo pipefail
+          python3 --version
+          python3 -m pip --version
+          git --version
+
+      - name: Install analysis dependencies
+        run: |
+          set -euxo pipefail
+          python3 -m pip install -r requirements-analysis.txt
+
+      - name: Fetch exact public CogARC and solver revisions
+        run: |
+          set -euxo pipefail
+          mkdir -p external
+
+          git init external/cogarc
+          git -C external/cogarc remote add origin https://github.com/ahn-cj/CogARC-dataRepository.git
+          git -C external/cogarc fetch --depth 1 origin "$COGARC_SHA"
+          git -C external/cogarc checkout --detach FETCH_HEAD
+
+          git init external/solver
+          git -C external/solver remote add origin https://github.com/tanmaybisen31/arc-agi-solver.git
+          git -C external/solver fetch --depth 1 origin "$SOLVER_SHA"
+          git -C external/solver checkout --detach FETCH_HEAD
+
+          test "$(git -C external/cogarc rev-parse HEAD)" = "$COGARC_SHA"
+          test "$(git -C external/solver rev-parse HEAD)" = "$SOLVER_SHA"
+
+      - name: Freeze discovery provenance
+        run: |
+          set -euxo pipefail
+          mkdir -p "$OUT_DIR"
+          {
+            echo "research_repo_sha=$(git rev-parse HEAD)"
+            echo "cogarc_sha=$(git -C external/cogarc rev-parse HEAD)"
+            echo "solver_sha=$(git -C external/solver rev-parse HEAD)"
+            echo "python=$(python3 --version 2>&1)"
+            echo "utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          } | tee "$OUT_DIR/provenance.txt"
+          sha256sum \
+            analysis/regenerate_stage003_task_states.py \
+            analysis/paper04_receiver_contract.py \
+            analysis/paper04_task_bootstrap.py \
+            analysis/paper04_state_transition_bootstrap.py \
+            analysis/paper04_discovery_runner.py \
+            src/receiver_contract.py \
+            external/cogarc/'Behavioral data'/trial_inclusion.csv \
+            external/cogarc/'Behavioral data'/subject_task_sequence_measures_mturk.csv \
+            > "$OUT_DIR/input_sha256.txt"
+          python3 -m pip freeze | sort > "$OUT_DIR/pip_freeze.txt"
+
+      - name: Regenerate and exactly audit Stage 003 agent states
+        run: |
+          set -euxo pipefail
+          python3 analysis/regenerate_stage003_task_states.py \
+            --cogarc-root external/cogarc \
+            --solver-root external/solver \
+            --out-dir "$OUT_DIR/agent_states" \
+            | tee "$OUT_DIR/regeneration_stdout.txt"
+
+      - name: Run frozen receiver measurement and recovery discovery
+        run: |
+          set -euxo pipefail
+          python3 analysis/paper04_discovery_runner.py \
+            --cogarc-root external/cogarc \
+            --agent-dir "$OUT_DIR/agent_states" \
+            --out-dir "$OUT_DIR/receiver" \
+            --min-history 30 \
+            --min-support 10 \
+            --min-common-tasks 30 \
+            --reliability-seeds 200 \
+            --n-boot 2000 \
+            --bootstrap-seed 240829 \
+            | tee "$OUT_DIR/discovery_stdout.txt"
+
+      - name: Run labeled post-discovery 240-to-321 paired diagnostic
+        run: |
+          set -euxo pipefail
+          python3 analysis/paper04_state_transition_bootstrap.py \
+            --rates "$OUT_DIR/receiver/receiver_task_stratum_rates.csv" \
+            --weak-rows "$OUT_DIR/agent_states/symbolic_240.csv" \
+            --strong-rows "$OUT_DIR/agent_states/symbolic_321.csv" \
+            --analysis-report "$OUT_DIR/receiver/paper04_discovery_summary.json" \
+            --n-boot 5000 \
+            --seed 240829 \
+            --out "$OUT_DIR/receiver/transition_240_to_321_post_discovery.json" \
+            | tee "$OUT_DIR/transition_stdout.txt"
+
+      - name: Emit machine-readable gate summary
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('results/paper04_discovery')
+          regen = root / 'agent_states' / 'regeneration_report.json'
+          disc = root / 'receiver' / 'paper04_discovery_summary.json'
+          transition = root / 'receiver' / 'transition_240_to_321_post_discovery.json'
+          report = {
+              'stage003_regeneration': None,
+              'paper04_primary_gate': None,
+              'measurement_gate': None,
+              'support_gate': None,
+              'n_common_support_tasks': None,
+              'post_discovery_transition_bootstrap': None,
+          }
+          if regen.exists():
+              r = json.loads(regen.read_text())
+              report['stage003_regeneration'] = r.get('verdict')
+          if disc.exists():
+              d = json.loads(disc.read_text())
+              report['paper04_primary_gate'] = d.get('primary_gate')
+              report['measurement_gate'] = d.get('measurement_reliability', {}).get('gate')
+              report['support_gate'] = d.get('support_gate')
+              report['n_common_support_tasks'] = d.get('n_common_support_tasks')
+          if transition.exists():
+              t = json.loads(transition.read_text())
+              report['post_discovery_transition_bootstrap'] = t.get('status')
+          (root / 'gate_summary.json').write_text(json.dumps(report, indent=2, sort_keys=True) + '\n')
+          print(json.dumps(report, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload discovery evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: paper04-independent-discovery-${{ github.sha }}
+          path: results/paper04_discovery/
+          if-no-files-found: error
+          retention-days: 30
