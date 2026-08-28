@@ -9,6 +9,8 @@ on:
       - 'src/receiver_contract.py'
       - 'analysis/paper04_receiver_contract.py'
       - 'analysis/paper04_task_bootstrap.py'
+      - 'analysis/regenerate_stage003_task_states.py'
+      - 'analysis/paper04_discovery_runner.py'
       - 'tests/test_receiver_contract.py'
       - 'tests/test_paper04_receiver_contract.py'
       - 'tests/test_paper04_task_bootstrap.py'
@@ -40,6 +42,8 @@ jobs:
             src/receiver_contract.py \
             analysis/paper04_receiver_contract.py \
             analysis/paper04_task_bootstrap.py \
+            analysis/regenerate_stage003_task_states.py \
+            analysis/paper04_discovery_runner.py \
             tests/test_receiver_contract.py \
             tests/test_paper04_receiver_contract.py \
             tests/test_paper04_task_bootstrap.py
