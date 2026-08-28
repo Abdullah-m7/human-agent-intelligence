@@ -9,6 +9,7 @@ on:
       - 'analysis/regenerate_stage003_task_states.py'
       - 'analysis/paper04_receiver_contract.py'
       - 'analysis/paper04_task_bootstrap.py'
+      - 'analysis/paper04_state_transition_bootstrap.py'
       - 'analysis/paper04_discovery_runner.py'
       - 'src/receiver_contract.py'
       - '.github/workflows/paper04-discovery.yml'
@@ -73,6 +74,7 @@ jobs:
             analysis/regenerate_stage003_task_states.py \
             analysis/paper04_receiver_contract.py \
             analysis/paper04_task_bootstrap.py \
+            analysis/paper04_state_transition_bootstrap.py \
             analysis/paper04_discovery_runner.py \
             src/receiver_contract.py \
             external/cogarc/'Behavioral data'/trial_inclusion.csv \
@@ -104,6 +106,19 @@ jobs:
             --bootstrap-seed 240829 \
             | tee "$OUT_DIR/discovery_stdout.txt"
 
+      - name: Run labeled post-discovery 240-to-321 paired diagnostic
+        run: |
+          set -euxo pipefail
+          python3 analysis/paper04_state_transition_bootstrap.py \
+            --rates "$OUT_DIR/receiver/receiver_task_stratum_rates.csv" \
+            --weak-rows "$OUT_DIR/agent_states/symbolic_240.csv" \
+            --strong-rows "$OUT_DIR/agent_states/symbolic_321.csv" \
+            --analysis-report "$OUT_DIR/receiver/paper04_discovery_summary.json" \
+            --n-boot 5000 \
+            --seed 240829 \
+            --out "$OUT_DIR/receiver/transition_240_to_321_post_discovery.json" \
+            | tee "$OUT_DIR/transition_stdout.txt"
+
       - name: Emit machine-readable gate summary
         if: always()
         run: |
@@ -114,12 +129,14 @@ jobs:
           root = Path('results/paper04_discovery')
           regen = root / 'agent_states' / 'regeneration_report.json'
           disc = root / 'receiver' / 'paper04_discovery_summary.json'
+          transition = root / 'receiver' / 'transition_240_to_321_post_discovery.json'
           report = {
               'stage003_regeneration': None,
               'paper04_primary_gate': None,
               'measurement_gate': None,
               'support_gate': None,
               'n_common_support_tasks': None,
+              'post_discovery_transition_bootstrap': None,
           }
           if regen.exists():
               r = json.loads(regen.read_text())
@@ -130,6 +147,9 @@ jobs:
               report['measurement_gate'] = d.get('measurement_reliability', {}).get('gate')
               report['support_gate'] = d.get('support_gate')
               report['n_common_support_tasks'] = d.get('n_common_support_tasks')
+          if transition.exists():
+              t = json.loads(transition.read_text())
+              report['post_discovery_transition_bootstrap'] = t.get('status')
           (root / 'gate_summary.json').write_text(json.dumps(report, indent=2, sort_keys=True) + '\n')
           print(json.dumps(report, indent=2, sort_keys=True))
           PY
