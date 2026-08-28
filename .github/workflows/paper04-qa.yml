@@ -8,8 +8,10 @@ on:
     paths:
       - 'src/receiver_contract.py'
       - 'analysis/paper04_receiver_contract.py'
+      - 'analysis/paper04_task_bootstrap.py'
       - 'tests/test_receiver_contract.py'
       - 'tests/test_paper04_receiver_contract.py'
+      - 'tests/test_paper04_task_bootstrap.py'
       - 'papers/04_receiver_competence/**'
       - '.github/workflows/paper04-qa.yml'
 
@@ -37,12 +39,15 @@ jobs:
           python3 -m py_compile \
             src/receiver_contract.py \
             analysis/paper04_receiver_contract.py \
+            analysis/paper04_task_bootstrap.py \
             tests/test_receiver_contract.py \
-            tests/test_paper04_receiver_contract.py
+            tests/test_paper04_receiver_contract.py \
+            tests/test_paper04_task_bootstrap.py
 
       - name: Run receiver-contract tests
         run: |
           python3 -m unittest \
             tests.test_receiver_contract \
             tests.test_paper04_receiver_contract \
+            tests.test_paper04_task_bootstrap \
             -v
