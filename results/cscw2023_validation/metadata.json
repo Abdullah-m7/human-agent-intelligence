@@ -1,0 +1,45 @@
+{
+  "lock_commit": "a51913e1920b5a45aaeea9f3dbb50afb6688a426",
+  "participants": 281,
+  "trials": 2810,
+  "groups": {
+    "accuracy": 92,
+    "analogy": 102,
+    "system": 87
+  },
+  "capability_standardization_scope": "all 2810 reconstructed participant-trials before disagreement filtering",
+  "capability_loto_mean": 0.42562277580071173,
+  "capability_loto_sd_population": 0.15270172047696498,
+  "estimator": "GLM_binomial_logit_participant_clustered_SE",
+  "glm_instability_detected": false,
+  "glm_warnings": {
+    "M1_helpful": [],
+    "M2_harmful": [],
+    "M3_selectivity": []
+  },
+  "disagreement_trials": 1465,
+  "helpful_disagreement_trials": 1118,
+  "harmful_disagreement_trials": 347,
+  "participants_with_disagreement": 281,
+  "participants_helpful": 281,
+  "participants_harmful": 227,
+  "outcome_variation": {
+    "helpful_switch_mean": 0.39803220035778175,
+    "harmful_switch_mean": 0.49279538904899134
+  },
+  "decision": {
+    "H1_helpful_estimate_negative": false,
+    "H1_two_sided_p": 0.3597076205402069,
+    "H2_harmful_estimate_negative": true,
+    "H2_two_sided_p": 0.9497219615257049,
+    "bonferroni_alpha_each": 0.025,
+    "classification": "TWO_SIDED_SUSCEPTIBILITY_NOT_SUPPORTED"
+  },
+  "input_sha256": {
+    "userinfo.csv": "9dd6e857c3fbe5f388dc68cb408ebd688a5a074c4f96989ac122a655ea3a9414",
+    "usertask.csv": "d02c61e6a1cbc4a8096578bfb3366a08434a189d8203c67d8f5f88d254e8a953",
+    "prolific_demographic.csv": "b8fd846bb874fd7a2c2d6248f743371f51d0b15f0ac6278b34567056697236c2",
+    "selected_samples.csv": "c741afc6b5696d4e1dd2578506fe73791c82e8bfbdf3bde714eab0e8b2db4fb9"
+  },
+  "construct_warning": "capability_loto is task-specific unaided accuracy, not IQ or general intelligence"
+}

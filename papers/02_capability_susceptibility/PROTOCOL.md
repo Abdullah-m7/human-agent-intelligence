@@ -185,3 +185,24 @@ Where continuous forecasts are available, model movement toward advice and final
 - results from advice-taking automatically generalize to autonomous agents.
 
 The last boundary is important: Paper 02 studies static/sequential AI advice. Paper 01 separately tests whether these human-side effects migrate when systems become genuinely agentic and autonomous.
+
+## Stage 002 update — Validation V1 outcome
+
+The first locked independent validation used He, Buijsman & Gadiraju (CSCW 2023). The complete lock and audit trail are in `VALIDATION_LOCK_V1.md` and `reports/STAGE_002_VALIDATION_V1.md`.
+
+**Result: TWO_SIDED_SUSCEPTIBILITY_NOT_SUPPORTED.**
+
+The registered helpful-susceptibility coefficient was positive rather than negative (`+0.0647`, p `0.360`), while the harmful-susceptibility coefficient was approximately zero (`-0.0080`, p `0.950`). Leave-one-item-out and participant-bootstrap diagnostics did not rescue the pattern.
+
+A post-validation reliability diagnostic found that the 10-item CSCW unaided-accuracy construct had very low split-half stability (mean Spearman–Brown ≈ `0.08`) and the LOTO capability score did not predict focal initial correctness. This does **not** change the failed validation verdict. It does impose a stronger eligibility requirement for Validation V2.
+
+### Validation V2 eligibility rule
+
+Before focal AI-reliance outcomes are inspected, the candidate dataset must provide at least one of:
+
+1. a direct, defensible cognitive / psychometric measure relevant to the hypothesized construct; or
+2. a repeated unaided task battery with enough observations to establish stable between-person capability independently of AI-use outcomes.
+
+For performance-derived capability, measurement reliability / predictive validity must be audited before the focal susceptibility model is run. The exact acceptance threshold will be locked for V2 before the candidate's focal outcome is inspected.
+
+The HAIID pattern is therefore retained as a **context-dependent discovery**, not a generic law.
