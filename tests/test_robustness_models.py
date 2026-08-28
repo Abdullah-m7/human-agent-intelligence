@@ -63,7 +63,8 @@ class SelectiveReviewTests(unittest.TestCase):
             specificity=0.90,
             review_threshold=0.75,
             beta_spec=0.20,
-            difficulty_scale=1.20,
+            agent_difficulty_scale=1.20,
+            human_difficulty_scale=1.20,
             review_sharpness=35.0,
             difficulty_points=101,
         )
@@ -85,6 +86,17 @@ class SelectiveReviewTests(unittest.TestCase):
         profile = selective_profile(p)
         self.assertGreater(profile["effective_autonomy"], 0.5)
         self.assertGreater(abs(selective_sensitivity(p, "specification")), 0.01)
+
+    def test_asymmetric_difficulty_slopes_change_review_value(self):
+        matched = selective_profile(self.base())
+        asymmetric = selective_profile(
+            self.base(agent_difficulty_scale=0.80, human_difficulty_scale=1.60)
+        )
+        self.assertNotAlmostEqual(
+            matched["joint_accuracy"] - matched["mean_agent_accuracy"],
+            asymmetric["joint_accuracy"] - asymmetric["mean_agent_accuracy"],
+            places=6,
+        )
 
 
 if __name__ == "__main__":
