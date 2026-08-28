@@ -8,11 +8,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 from typing import Any, Sequence
 
 import numpy as np
 import pandas as pd
+
+REPO = Path(__file__).resolve().parents[1]
+if str(REPO) not in sys.path:
+    sys.path.insert(0, str(REPO))
 
 from analysis.cogarc_capability_twin_poc import load_humans
 
