@@ -1,0 +1,37 @@
+name: Paper 04 Receiver Contract QA
+
+on:
+  push:
+    branches:
+      - paper-04-receiver-contract
+  pull_request:
+    paths:
+      - 'src/receiver_contract.py'
+      - 'tests/test_receiver_contract.py'
+      - 'papers/04_receiver_competence/**'
+      - '.github/workflows/paper04-qa.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  receiver-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Inspect runner Python
+        run: |
+          python3 --version
+          python3 -m pip --version
+
+      - name: Install analysis dependencies
+        run: python3 -m pip install -r requirements-analysis.txt
+
+      - name: Compile receiver-contract code
+        run: python3 -m py_compile src/receiver_contract.py tests/test_receiver_contract.py
+
+      - name: Run receiver-contract tests
+        run: python3 -m unittest tests.test_receiver_contract -v
