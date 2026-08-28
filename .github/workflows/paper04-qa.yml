@@ -7,7 +7,9 @@ on:
   pull_request:
     paths:
       - 'src/receiver_contract.py'
+      - 'analysis/paper04_receiver_contract.py'
       - 'tests/test_receiver_contract.py'
+      - 'tests/test_paper04_receiver_contract.py'
       - 'papers/04_receiver_competence/**'
       - '.github/workflows/paper04-qa.yml'
 
@@ -31,7 +33,16 @@ jobs:
         run: python3 -m pip install -r requirements-analysis.txt
 
       - name: Compile receiver-contract code
-        run: python3 -m py_compile src/receiver_contract.py tests/test_receiver_contract.py
+        run: |
+          python3 -m py_compile \
+            src/receiver_contract.py \
+            analysis/paper04_receiver_contract.py \
+            tests/test_receiver_contract.py \
+            tests/test_paper04_receiver_contract.py
 
       - name: Run receiver-contract tests
-        run: python3 -m unittest tests.test_receiver_contract -v
+        run: |
+          python3 -m unittest \
+            tests.test_receiver_contract \
+            tests.test_paper04_receiver_contract \
+            -v
