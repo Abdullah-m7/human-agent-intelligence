@@ -77,9 +77,14 @@ def task_dict(cogarc_root: Path, task_ids: list[str]) -> dict:
     out = {}
     for name in task_ids:
         t = json.loads((cogarc_root / "Task JSONs" / f"{name}.json").read_text())
+        # CogARC behavior is scored against the first ARC test query. Two source
+        # tasks retain an additional original ARC test query, but their CogARC
+        # Success grids and participant submissions correspond to test[0]. Keep
+        # machine and human outcomes on the same participant-visible target.
+        target = t["test"][0]
         out[name] = {
             "train": [(np.array(p["input"], int), np.array(p["output"], int)) for p in t["train"]],
-            "test": [(np.array(p["input"], int), np.array(p["output"], int)) for p in t["test"]],
+            "test": [(np.array(target["input"], int), np.array(target["output"], int))],
         }
     return out
 

@@ -1,0 +1,79 @@
+name: Research QA
+
+on:
+  pull_request:
+  push:
+    branches:
+      - stage-004-second-agent-family
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  unit-and-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Inspect runner Python
+        run: |
+          python3 --version
+          python3 -m pip --version
+
+      - name: Install analysis dependencies
+        run: python3 -m pip install -r requirements-analysis.txt
+
+      - name: Compile Python sources
+        run: |
+          python3 -m compileall -q src analysis tests
+
+      - name: Run unit and protocol tests
+        run: |
+          python3 -m unittest discover -s tests -v
+
+      - name: Verify draft confirmatory lock stays sealed
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import importlib.util
+          import sys
+
+          path = Path('analysis/stage004_llm_hdc.py').resolve()
+          spec = importlib.util.spec_from_file_location('stage004_llm_hdc_ci', path)
+          mod = importlib.util.module_from_spec(spec)
+          sys.modules[spec.name] = mod
+          spec.loader.exec_module(mod)
+
+          status = mod.lock_status(mod.LOCK_FILE.read_text(encoding='utf-8'))
+          assert status == 'DRAFT_DO_NOT_EVALUATE', status
+          try:
+              mod.assert_phase_allowed('eval')
+          except SystemExit:
+              pass
+          else:
+              raise AssertionError('draft lock unexpectedly allowed confirmatory eval')
+          PY
+
+      - name: Reject partial confirmatory evaluation
+        run: |
+          python3 - <<'PY'
+          import importlib.util
+          import sys
+          from pathlib import Path
+
+          path = Path('analysis/stage004_llm_hdc.py').resolve()
+          spec = importlib.util.spec_from_file_location('stage004_llm_hdc_scope_ci', path)
+          mod = importlib.util.module_from_spec(spec)
+          sys.modules[spec.name] = mod
+          spec.loader.exec_module(mod)
+
+          for limit, only in ((1, None), (None, ['00dbd492'])):
+              try:
+                  mod.assert_eval_scope('eval', limit, only)
+              except SystemExit:
+                  continue
+              raise AssertionError('partial confirmatory eval was not rejected')
+          PY

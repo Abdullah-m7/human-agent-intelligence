@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "split_name": "stage004_llm_hdc_v1",
+  "selection_rule": "Development contains every CogARC task touched during Stage-004 feasibility plus the nine remaining tasks with the smallest maximum grid-cell count, ties by task id. All other CogARC tasks are sealed evaluation.",
+  "development_tasks": [
+    "00d62c1b", "0d3d703e", "12eac192", "1e0a9b12", "23581191",
+    "3aa6fb7a", "3ac3eb23", "6ea4a07e", "7447852a", "74dd1130",
+    "93b581b8", "9dfd6313", "a3df8b1e", "c8f0f002", "d511f180"
+  ],
+  "evaluation_tasks": [
+    "00dbd492", "0a2355a6", "0a938d79", "0b17323b", "0ca9ddb6",
+    "0d87d2a6", "0e671a1a", "1a07d186", "1b60fb0c", "1bfc4729",
+    "1c02dbbe", "1c0d0a4b", "1caeab9d", "1e32b0e9", "1f0c79e5",
+    "1f642eb9", "1f876c06", "21f83797", "2546ccf6", "2bcee788",
+    "2bee17df", "2c608aff", "2dd70a9a", "32597951", "3befdf3e",
+    "3eda0437", "4258a5f9", "42a15761", "4b6b68e5", "5168d44c",
+    "55783887", "5c0a986e", "6455b5f5", "69889d6e", "6a1e5592",
+    "6d58a25d", "73251a56", "73c3b0d8", "7df24a62", "82819916",
+    "834ec97d", "8cb8642d", "90f3ed37", "96a8c0cd", "9ddd00f0",
+    "a1570a43", "baf41dbf", "bcb3040b", "c0f76784", "c444b776",
+    "ca8f78db", "ce9e57f2", "d364b489", "d43fd935", "d5d6de2d",
+    "d9f24cd1", "e69241bd", "e8593010", "ecaa0ec1", "fe9372f3"
+  ],
+  "hdc_index_rule": "int(sha256(task_id),16) mod n_training_pairs",
+  "evaluation_status": "SEALED_UNTIL_CONFIRMATORY_LOCK"
+}
