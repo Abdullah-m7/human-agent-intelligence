@@ -1,0 +1,55 @@
+{
+  "candidates": [
+    {
+      "act_coverage": 0.4,
+      "hdc_parse_rate": 0.9333333333333333,
+      "mean_production_completion_tokens": 92.13333333333334,
+      "model_label": "gemma4-26b-a4b-q4km",
+      "n_tasks": 15,
+      "production_parse_rate": 0.8,
+      "standalone_accuracy": 0.13333333333333333
+    },
+    {
+      "act_coverage": 0.06666666666666667,
+      "hdc_parse_rate": 0.8666666666666667,
+      "mean_production_completion_tokens": null,
+      "model_label": "qwen35-9b-q4km",
+      "n_tasks": 15,
+      "production_parse_rate": 0.6666666666666666,
+      "standalone_accuracy": 0.0
+    }
+  ],
+  "eligibility": [
+    {
+      "eligible": true,
+      "model_label": "gemma4-26b-a4b-q4km",
+      "reasons": []
+    },
+    {
+      "eligible": false,
+      "model_label": "qwen35-9b-q4km",
+      "reasons": [
+        "production_parse_below_0.80",
+        "zero_standalone_accuracy",
+        "act_coverage_below_0.133333"
+      ]
+    }
+  ],
+  "forbidden_selection_inputs": [
+    "unsafe_autonomy_mass",
+    "act_precision",
+    "joint_performance",
+    "human_leverage"
+  ],
+  "rule_version": "STAGE004_MODEL_SELECTION_RULE_V1",
+  "selection": {
+    "eligible_models": [
+      "gemma4-26b-a4b-q4km"
+    ],
+    "strong_accuracy": null,
+    "strong_model": null,
+    "verdict": "NO_ELIGIBLE_LLM_PAIR",
+    "weak_accuracy": null,
+    "weak_model": null
+  }
+}

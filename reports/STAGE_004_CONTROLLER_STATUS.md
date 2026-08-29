@@ -4,11 +4,11 @@ Date: 2026-08-29
 
 ## Decision
 
-**STAGE 004: IN PROGRESS**
+**STAGE 004 DEVELOPMENT: COMPLETE — NO_ELIGIBLE_LLM_PAIR**
 
 **CONFIRMATORY EVALUATION: SEALED / DO NOT RUN**
 
-Current confirmatory lock status is `DRAFT_DO_NOT_EVALUATE`. No controller-approved query to the 60-task evaluation split is permitted until development selection is complete and the lock is finalized in a later commit.
+Current confirmatory lock status is `DRAFT_DO_NOT_EVALUATE`. The frozen development selector found fewer than two eligible models, so the 60-task evaluation split must remain sealed and no confirmatory lock may be finalized under this candidate pool.
 
 ## Durable evidence already established
 
@@ -48,7 +48,54 @@ Under the earlier frozen pre-evaluation selection rule, this state cannot be use
 
 ### Qwen3.5-9B
 
-A local development execution had been launched, but no controller-inspected aggregate result is durably recorded in GitHub yet. **Do not infer its outcome from process state or stale local files.** Development selection remains incomplete until its 15-task result is recovered/re-run under matching provenance and inspected.
+Qwen3.5-9B Q4_K_M completed all 15 fixed development tasks under the unchanged HDC contract.
+
+Recorded development endpoints:
+
+- standalone exact-match accuracy: `0/15 = 0.0000`;
+- production parse rate: `10/15 = 0.6667`;
+- HDC parse rate: `13/15 = 0.8667`;
+- HDC pass rate: `2/15 = 0.1333`;
+- ACT coverage: `1/15 = 0.0667`;
+- ACT precision: `0/1 = 0.0000`;
+- wrong autonomous acts: `1/15`;
+- Unsafe Autonomy Mass: `1/15 = 0.0667`.
+
+Task-balanced archived-human endpoints on the same development tasks:
+
+- human ONE_SHOT: `0.7842`;
+- HDC-routed Human+Qwen3.5-9B ONE_SHOT: `0.7366`;
+- human RETRY3: `0.8703`;
+- HDC-routed Human+Qwen3.5-9B RETRY3: `0.8100`.
+
+The runner's deterministic resume validator accepted all 15 rows against the current model alias, model label, prompt hashes, response-format hash, split hash, seed, temperature, participant target, and token limit. Qwen3.5-9B is `DEV_NONVIABLE` because production parse rate is below `0.80`, standalone accuracy is zero, and ACT coverage is below `2/15`.
+
+Execution provenance:
+
+- device/runtime: Apple M4 MacBook Air, 24 GB unified memory, Darwin arm64, Python `3.9.6`;
+- llama.cpp build: `version 1 (9ee9a1c)`, AppleClang `17.0.0.17000013`, Darwin arm64;
+- model file: `/Users/3obd/Library/Application Support/ai.atomicbot.hermes/llamacpp/models/qwen-3.5-9b/Qwen3.5-9B-Q4_K_M.gguf`;
+- model SHA256: `03b74727a860a56338e042c4420bb3f04b2fec5734175f4cb9fa853daf52b7e8`;
+- server arguments: `-m <model-file> --port 8099 --ctx-size 8192 --parallel 1 --alias qwen35-9b --reasoning off --log-disable`;
+- runner repository HEAD at inference: `257b0a4ffb2af919db7567651308e56c2153624d`;
+- runner last-modifying commit: `1767fa4d90719cc46435c17281aec6453de0b1ec`;
+- CogARC repository commit: `1a319935b803580fcbd6ff002195df86a7e90095`.
+
+## Development model-selection result
+
+The executable frozen selector returned `NO_ELIGIBLE_LLM_PAIR`.
+
+- `gemma4-26b-a4b-q4km`: `EVAL_ELIGIBLE`;
+- `qwen35-9b-q4km`: `DEV_NONVIABLE`;
+- `qwen35-4b-q4km`: previously classified `DEV_NONVIABLE` and not supplied as an incomplete candidate summary.
+
+The sole eligible model is Gemma. `WEAK_MODEL` and `STRONG_MODEL` therefore remain undefined, and selection did not inspect or use any team metric, Unsafe Autonomy Mass, ACT precision, Human Leverage, or desired inversion outcome.
+
+## Local Gemma artefact audit
+
+The archived 15-row local Gemma file reproduces the recorded standalone, HDC-pass, ACT, ACT-precision, and Unsafe-Autonomy-Mass endpoints, but re-summarizing those exact rows reports production parse `12/15 = 0.8000` and HDC parse `14/15 = 0.9333`, whereas the earlier controller status and development ledger state production parse `15/15 = 1.0000`.
+
+No Gemma row was changed and no Gemma inference was repeated. For the executable selector, a separate selection-input summary was derived mechanically from the archived rows with `analysis.stage004_llm_hdc.summarize`. This discrepancy does not change Gemma's eligibility or the final selection verdict: `0.8000` meets the frozen production-parse threshold, while Qwen3.5-9B independently fails three eligibility criteria. Historical partial `-v2` artefacts were preserved and were not used for selection.
 
 ## Authoritative selection governance
 
@@ -73,20 +120,9 @@ The conflict was corrected immediately:
 
 Git history intentionally preserves both the mistaken late commit and its correction. The late policy has **no scientific authority**.
 
-## Current blocker
+## Final development disposition
 
-The authorized local computer is currently disconnected from the remote execution tool. Therefore Qwen3.5-9B inference cannot be completed or recovered in this controller session.
-
-This is an execution blocker only. It does not justify changing the candidate pool, selection rule, HDC gate, split, or confirmatory criteria.
-
-## Next executable gate after device reconnection
-
-1. Synchronize local `stage-004-second-agent-family` with the remote branch before any further run.
-2. Recover the Qwen3.5-9B development rows only if their stored row provenance passes the runner's resume validation; otherwise restart that development state from the fixed 15-task split.
-3. Complete all 15 development tasks.
-4. Run `analysis/stage004_model_selection.py` on the eligible complete development summaries.
-5. If fewer than two eligible states remain, record `NO_ELIGIBLE_LLM_PAIR` and do **not** unlock evaluation.
-6. If a pair is selected, fill every pending provenance field in `STAGE004_CONFIRMATORY_LOCK_V1.md`, change the status to `LOCKED` in a dedicated commit, and only then permit the full 60-task evaluation.
+Stage 004 stops at `NO_ELIGIBLE_LLM_PAIR` under the frozen candidate pool and selection rule. Do **not** unlock, inspect, or query the 60-task evaluation split. The confirmatory lock remains `DRAFT_DO_NOT_EVALUATE`; creating a different candidate pool would require a new versioned protocol while preserving this negative development result.
 
 ## Publication boundary
 

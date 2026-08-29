@@ -58,9 +58,50 @@ Reason for stopping: there was no autonomous region to evaluate and substantial 
 
 ## Qwen3.5-9B Q4_K_M
 
-Development execution was launched locally after Qwen3.5-4B was classified nonviable. At the time the pre-evaluation selection rule was committed, **no Qwen3.5-9B development row or aggregate result had been inspected by the controller**.
+Development run: **COMPLETE — 15/15 fixed development tasks**.
 
-Status in this ledger: **OUTCOME NOT YET INSPECTED**.
+Observed task-level endpoints:
+
+- standalone exact-match accuracy: `0/15 = 0.0000`;
+- production parse rate: `10/15 = 0.6667`;
+- HDC parse rate: `13/15 = 0.8667`;
+- HDC pass rate: `2/15 = 0.1333`;
+- ACT coverage: `1/15 = 0.0667`;
+- ACT precision: `0/1 = 0.0000`;
+- wrong autonomous acts: `1/15`;
+- Unsafe Autonomy Mass: `1/15 = 0.0667`.
+
+Task-balanced archived-human endpoints on the same 15 tasks:
+
+- human ONE_SHOT: `0.7842`;
+- HDC-routed Human+Qwen3.5-9B ONE_SHOT: `0.7366`;
+- human RETRY3: `0.8703`;
+- HDC-routed Human+Qwen3.5-9B RETRY3: `0.8100`.
+
+Participant-weighted robustness endpoints:
+
+- human ONE_SHOT: `0.7936`;
+- joint ONE_SHOT: `0.7446`;
+- human RETRY3: `0.8784`;
+- joint RETRY3: `0.8164`.
+
+The 15-row file passed the runner's deterministic resume-provenance validation. Qwen3.5-9B is classified **DEV_NONVIABLE** because production parse is below `0.80`, standalone accuracy is zero, and ACT coverage is below `2/15`.
+
+Exact execution provenance is recorded in `reports/STAGE_004_CONTROLLER_STATUS.md`. Primary artefacts are:
+
+- `results/stage004_llm_hdc/dev_qwen35-9b-q4km_rows.jsonl`;
+- `results/stage004_llm_hdc/dev_qwen35-9b-q4km_summary.json`;
+- `results/stage004_llm_hdc/dev_qwen35-9b-q4km_joint.json`.
+
+## Development selection verdict
+
+The frozen executable selector returned **NO_ELIGIBLE_LLM_PAIR**. Gemma is the only eligible model; Qwen3.5-4B and Qwen3.5-9B are nonviable under the frozen rule. No WEAK/STRONG pair is defined.
+
+The confirmatory lock remains `DRAFT_DO_NOT_EVALUATE`, and the 60 evaluation tasks remain sealed.
+
+## Artefact consistency note
+
+The archived local Gemma rows reproduce the substantive recorded endpoints but re-summarize to production parse `12/15 = 0.8000` and HDC parse `14/15 = 0.9333`, while the earlier ledger recorded production parse `15/15 = 1.0000`. The archived rows were not altered and Gemma inference was not repeated. A separate selector input was mechanically derived from those rows; Gemma remains eligible exactly at the production-parse threshold, so the discrepancy does not change `NO_ELIGIBLE_LLM_PAIR`. Historical partial `-v2` files remain preserved and were not used for selection.
 
 ## Target-alignment audit
 
@@ -69,3 +110,5 @@ CogARC behavioral submissions correspond to the first source ARC test query (`te
 ## Gate to evaluation
 
 No model may enter the 60 sealed tasks merely because its development team result is interesting. Pair selection is controlled by `papers/01_agentic_bottleneck/STAGE004_MODEL_SELECTION_RULE_V1.md` and uses operational viability plus standalone development accuracy only.
+
+That gate has now closed with `NO_ELIGIBLE_LLM_PAIR`. Evaluation is not authorized under this protocol version.

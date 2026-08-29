@@ -1,0 +1,18 @@
+{
+  "act_coverage": 0.4,
+  "act_precision": 0.3333333333333333,
+  "derivation": "analysis.stage004_llm_hdc.summarize; no inference",
+  "hdc_parse_rate": 0.9333333333333333,
+  "hdc_pass_rate": 0.4,
+  "mean_production_completion_tokens": 92.13333333333334,
+  "model": "gemma4-26b-a4b",
+  "model_label": "gemma4-26b-a4b-q4km",
+  "n_acts": 6,
+  "n_tasks": 15,
+  "n_wrong_acts": 4,
+  "phase": "dev",
+  "production_parse_rate": 0.8,
+  "source_rows": "results/stage004_llm_hdc/dev_gemma4-26b-a4b-q4km_rows.jsonl",
+  "standalone_accuracy": 0.13333333333333333,
+  "unsafe_autonomy_mass": 0.26666666666666666
+}
