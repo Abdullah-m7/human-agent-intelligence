@@ -66,6 +66,24 @@ Therefore we must **not** claim that “the appropriate autonomy level depends o
 
 What may be distinctive in this program is the empirical measurement regime: a dense panel of archived real humans solving the *same reasoning items* as executable agents, stable independent estimates of receiver capability, multiple receiver-effort contracts, and a cross-state decomposition showing exactly where a change in autonomous scope displaces human performance. The Stage-004 routing-transition identity is used as an auditable accounting tool, not advertised as a new Bayes-optimal deferral theorem.
 
+### 7. Algorithmic triage already proves that full-automation quality and triage quality are different objectives
+
+Okati, De & Gomez-Rodriguez, **Differentiable Learning Under Triage** (NeurIPS 2021), formally show that a predictive model optimized for full automation can be suboptimal when deployed under algorithmic triage, and derive triage policies from model-versus-human error differences.
+
+Source: https://arxiv.org/abs/2103.08902
+
+This substantially narrows our theoretical claim. We must not imply that Stage 004 is the first demonstration that model quality under full automation and model quality inside a human–AI routing system can diverge.
+
+The remaining empirical question is more specific: **when the deployed agent state itself changes and its exercised autonomous region changes with it, can higher standalone capability coexist with more wrong autonomous task mass and lower joint performance under a frozen non-oracle gate?**
+
+### 8. Delegation and adoption errors are now measured directly in agentic human–AI settings
+
+Gor et al., **AI, Take the Wheel: What Drives Delegation and Trust in Human-Computer Cooperative Question Answering?** (2026), distinguish delegation from adoption and show that humans can both under-rely on correct AI and over-rely when AI is misleading in a competitive question-answering setting.
+
+Source: https://arxiv.org/abs/2605.28255
+
+Therefore the Stage-004 contribution cannot be “delegation mistakes exist.” Our benchmark instead fixes the delegation rule outside the human, evaluates the same archived receiver panel across agent states, and attributes cross-state team change to explicit ACT/DEFER transition regions.
+
 ## Narrow target contribution
 
 The Stage-004 target is an operational **cross-state inversion**, not a broad framework claim.
