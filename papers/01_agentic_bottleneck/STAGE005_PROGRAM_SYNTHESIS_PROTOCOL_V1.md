@@ -19,11 +19,14 @@ Engineering may inform prompt and operational settings. After the contract commi
 - Model: the locally archived Gemma-4-26B-A4B Q4_K_M file identified by SHA256 in machine-readable provenance.
 - One system prompt and one user template for every candidate.
 - Temperature `0.8`, top-p `0.95`, maximum completion `1536` tokens.
+- Calibration llama.cpp context is `16384` tokens. A tokenizer-only audit found a maximum fixed calibration prompt of `11970` tokens; prompt plus the full completion cap is `13506`.
 - Candidate index is one-based; seed is `505000 + candidate_index`.
 - Candidate budgets are literal prefixes of one sequence: `B1=1`, `B2=2`, `B4=4`, `B8=8`.
 - A raw Python response beginning with `def solve(grid):` is accepted; a single Python Markdown fence is tolerated by the parser. No semantic repair is performed.
 
 Exact prompt hashes, response-contract hash, model hash, llama.cpp build identity, server arguments, source-data commit, split hash, and sandbox policy are recorded in each candidate row and the phase provenance.
+
+The first calibration attempt under commit `b6ecbcbe9ca5e37f2ab42d9e4d14711789f4950d` was invalidated after 72 candidate rows because its `--ctx-size 8192` server rejected the next visible prompt before inference (`11970 > 8192`). Those rows are archived as invalidated and are forbidden from the replacement calibration. The replacement run starts at 0/480 under the superseding contract commit.
 
 ## Sandbox and candidate validity
 

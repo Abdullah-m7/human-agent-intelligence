@@ -97,6 +97,12 @@ class OpenAICompatSynthesisClient:
         self.model = model
         self.timeout_s = timeout_s
 
+    def server_context_size(self) -> int:
+        req = request.Request(self.base_url + "/props", method="GET")
+        with request.urlopen(req, timeout=30) as response:
+            obj = json.loads(response.read().decode("utf-8"))
+        return int(obj["default_generation_settings"]["n_ctx"])
+
     def infer(
         self,
         training: Sequence[dict[str, Any]],

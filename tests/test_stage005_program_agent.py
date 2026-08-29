@@ -9,7 +9,11 @@ from src.program_agent.candidate import (
     parse_program_response,
     select_best,
 )
-from analysis.stage005_program_synthesis import attach_summary_provenance, validate_resume_row
+from analysis.stage005_program_synthesis import (
+    attach_summary_provenance,
+    validate_calibration_server_args,
+    validate_resume_row,
+)
 
 
 def candidate(index, fit, certified=False, prediction=None, valid=True):
@@ -31,6 +35,13 @@ def candidate(index, fit, certified=False, prediction=None, valid=True):
 
 
 class Stage005ProgramAgentTests(unittest.TestCase):
+    def test_calibration_server_context_is_frozen(self):
+        validate_calibration_server_args("llama-server --ctx-size 16384 --parallel 1")
+        with self.assertRaisesRegex(SystemExit, "requires --ctx-size 16384"):
+            validate_calibration_server_args("llama-server --ctx-size 8192 --parallel 1")
+        with self.assertRaisesRegex(SystemExit, "exactly one"):
+            validate_calibration_server_args("llama-server --parallel 1")
+
     def test_resume_provenance_mismatch_is_rejected(self):
         expected = {"max_candidates": 8, "system_prompt_sha256": "frozen"}
         row = {

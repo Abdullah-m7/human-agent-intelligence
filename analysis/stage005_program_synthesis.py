@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import shlex
 import subprocess
 import sys
 from dataclasses import asdict, fields
@@ -38,6 +39,7 @@ from src.program_agent.sandbox import SandboxPolicy
 SPLIT_FILE = REPO / "benchmarks" / "capability_twin" / "stage005_split.json"
 DEFAULT_DATA = Path("/tmp/ARC-AGI/data/training")
 DEFAULT_OUT = REPO / "results" / "stage005_program_synthesis"
+REQUIRED_CALIBRATION_CTX_SIZE = 16_384
 CONTRACT_PATHS = (
     "src/program_agent",
     "analysis/stage005_program_synthesis.py",
@@ -301,6 +303,21 @@ def _assert_contract_tree_clean() -> None:
         raise SystemExit(f"calibration contract files differ from HEAD:\n{status}")
 
 
+def validate_calibration_server_args(server_args: str) -> None:
+    tokens = shlex.split(server_args)
+    positions = [index for index, token in enumerate(tokens) if token == "--ctx-size"]
+    if len(positions) != 1 or positions[0] + 1 >= len(tokens):
+        raise SystemExit("calibration server args must declare exactly one --ctx-size")
+    try:
+        context_size = int(tokens[positions[0] + 1])
+    except ValueError as exc:
+        raise SystemExit("calibration --ctx-size must be an integer") from exc
+    if context_size != REQUIRED_CALIBRATION_CTX_SIZE:
+        raise SystemExit(
+            f"calibration requires --ctx-size {REQUIRED_CALIBRATION_CTX_SIZE}, got {context_size}"
+        )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--phase", choices=["engineering", "calibration"], required=True)
@@ -329,6 +346,7 @@ def main() -> int:
         if _current_head() != args.contract_commit:
             raise SystemExit("calibration HEAD does not equal the declared contract-freeze commit")
         _assert_contract_tree_clean()
+        validate_calibration_server_args(args.server_args)
 
     split = load_split(args.split_file)
     task_ids = phase_task_ids(split, args.phase)
@@ -368,6 +386,13 @@ def main() -> int:
         raise SystemExit(f"REFUSING RESUME: {exc}") from exc
     done = {(row["task_id"], row["candidate_index"]) for row in candidate_rows}
     client = OpenAICompatSynthesisClient(args.base_url, args.model)
+    if args.phase == "calibration":
+        actual_context_size = client.server_context_size()
+        if actual_context_size != REQUIRED_CALIBRATION_CTX_SIZE:
+            raise SystemExit(
+                f"calibration server reports n_ctx={actual_context_size}; "
+                f"required={REQUIRED_CALIBRATION_CTX_SIZE}"
+            )
 
     total_calls = len(task_ids) * args.max_candidates
     completed_calls = len(done)

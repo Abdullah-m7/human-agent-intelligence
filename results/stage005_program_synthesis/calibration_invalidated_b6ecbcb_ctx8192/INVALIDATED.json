@@ -1,0 +1,28 @@
+{
+  "calibration_scientifically_valid": false,
+  "completed_candidate_rows": 72,
+  "completed_tasks": 9,
+  "contract_commit": "b6ecbcbe9ca5e37f2ab42d9e4d14711789f4950d",
+  "failure": {
+    "candidate_index": 1,
+    "error": "HTTP 400: request (11970 tokens) exceeds the available context size (8192 tokens)",
+    "n_ctx": 8192,
+    "n_prompt_tokens": 11970,
+    "seed": 505001,
+    "task_id": "484b58aa"
+  },
+  "reason": "FROZEN_SERVER_CONTEXT_TOO_SMALL_FOR_FIXED_CALIBRATION_PROMPT",
+  "replacement_requirement": "RESTART_ALL_60_TASKS_FROM_0_OF_480_UNDER_NEW_CONTRACT_COMMIT_WITH_CTX_16384",
+  "rows_must_not_merge_with_replacement": true,
+  "status": "INVALIDATED",
+  "uses_cogarc_payloads": false,
+  "visible_prompt_token_audit": {
+    "chosen_replacement_n_ctx": 16384,
+    "completion_token_cap": 1536,
+    "max_prompt_plus_completion_cap": 13506,
+    "max_prompt_task_id": "484b58aa",
+    "max_prompt_tokens": 11970,
+    "tasks_audited": 60,
+    "uses_hidden_target_outputs": false
+  }
+}
