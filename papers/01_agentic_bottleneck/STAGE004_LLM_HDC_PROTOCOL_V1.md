@@ -14,7 +14,7 @@ The second family is a **generative LLM ARC agent**, not another detector librar
 - The remaining 60 tasks are **sealed evaluation**.
 - No prompt, ACT rule, parser rule, model-state ordering, or success criterion may be changed after evaluation is unlocked.
 - A separate confirmatory lock must be committed before the runner is allowed to query any evaluation task.
-- Development state selection is governed by `STAGE004_DEV_SELECTION_POLICY_V1.md`, frozen before Qwen development results. The primary direction is fixed as Qwen3.5-4B → Qwen3.5-9B and may not be reversed post hoc.
+- Candidate eligibility and pair selection are governed only by the earlier frozen `STAGE004_MODEL_SELECTION_RULE_V1.md` (commit `cc3be19c67eb88b9a1d053939a01690423e04463`).
 
 ## Leakage rule
 
@@ -48,14 +48,15 @@ Thus ACT is earned by a behavioral certificate available before test ground-trut
 
 ## Candidate LLM family
 
-Development may compare locally available models to determine whether they are viable enough for a locked replication. The intended core pair is the same-model-family comparison:
+The fixed development candidate pool under the pre-evaluation selection rule is:
 
 - Qwen3.5-4B Q4_K_M;
-- Qwen3.5-9B Q4_K_M.
+- Qwen3.5-9B Q4_K_M;
+- Gemma-4-26B-A4B Q4_K_M.
 
-Gemma-4-26B-A4B Q4_K_M is an architecture-shift stress test, not automatically a point on a parameter-scaling curve and cannot replace a Qwen endpoint merely to produce a desired inversion.
+Gemma is an architecture-shift stress test; parameter count is not treated as a causal capability axis. Qwen3.5-4B has already been classified `DEV_NONVIABLE` under the earlier frozen rule and cannot be resurrected as an artificial weak endpoint.
 
-Exact model hashes, prompt bytes, inference parameters, parser, and endpoint implementation will be frozen in the confirmatory lock after development.
+Exact selected model hashes, prompt bytes, inference parameters, parser, and endpoint implementation must be frozen in the confirmatory lock before any evaluation query.
 
 ## Primary metrics
 
@@ -68,23 +69,25 @@ On the 60 sealed tasks:
 - human–agent joint performance under ONE_SHOT and RETRY3 receiver contracts;
 - Human Leverage and Human Leverage Gradient where sample density permits.
 
-The **task-balanced ONE_SHOT joint performance** is the primary team endpoint. RETRY3 and participant-weighted outcomes are robustness endpoints and cannot replace it after results are seen.
+The **task-balanced ONE_SHOT joint performance** is the primary team endpoint. RETRY3 and participant-weighted outcomes are robustness endpoints.
 
 ## Replication decision
 
-The exact adjacent model states and minimum coverage requirement are governed by `STAGE004_DEV_SELECTION_POLICY_V1.md` and must be restated in the confirmatory lock before any evaluation query.
+The selected WEAK/STRONG states and ordering must come from `STAGE004_MODEL_SELECTION_RULE_V1.md`, using development standalone accuracy only after the operational viability gate. Team performance and Unsafe Autonomy Mass are forbidden inputs to selection.
 
-A **Capability–Autonomy Gap replication** requires, for the pre-ordered adjacent pair:
+A **Capability–Autonomy Gap replication** requires, for the preordered selected pair on the sealed evaluation set:
 
 1. standalone accuracy strictly increases;
 2. Unsafe Autonomy Mass increases; and
 3. task-balanced ONE_SHOT joint performance decreases.
 
+If sealed evaluation reverses or ties the preregistered standalone ordering, the verdict is `INCONCLUSIVE_CAPABILITY_ORDER`; labels may not be swapped.
+
+Each selected state must ACT on at least `6/60 = 10%` of sealed tasks. If either state falls below this predeclared coverage floor, the verdict is `INCONCLUSIVE_LOW_AUTONOMY_COVERAGE`.
+
+If ordering and coverage are valid but the three primary conditions do not all occur, Stage 004 records **NO REPLICATION**.
+
 The RETRY3 direction is a predeclared robustness endpoint, not silently required or discarded after results are seen.
-
-Each state must generate ACT on at least **10 of the 60** sealed evaluation tasks. If either state has fewer than 10 ACTs, the predeclared verdict is **INCONCLUSIVE_LOW_AUTONOMY_COVERAGE** regardless of directional inequalities.
-
-If coverage is adequate but the three primary conditions do not all occur, Stage 004 records **NO REPLICATION**.
 
 ## Claims not permitted
 
@@ -92,4 +95,4 @@ If coverage is adequate but the three primary conditions do not all occur, Stage
 - No claim that HDC is universally calibrated from development data.
 - No use of the 15 development tasks in the confirmatory Stage-004 headline estimate.
 - No prompt/gate retuning after the first evaluation request.
-- No reversing Qwen model order or substituting Gemma to manufacture a positive replication.
+- No pair selection based on development team performance, Unsafe Autonomy Mass, or whether the desired inversion appears.
