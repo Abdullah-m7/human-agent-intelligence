@@ -34,6 +34,15 @@ from src.program_agent.candidate import (
     evaluate_candidate,
 )
 from src.program_agent.sandbox import SandboxPolicy
+from src.program_agent.confirmatory import (
+    CONFIRMATORY_PHASE,
+    LOCK_FILE as CONFIRMATORY_LOCK_FILE,
+    ConfirmatoryAbort,
+    confirmatory_row_provenance,
+    validate_execution_lock,
+    validate_runtime_arguments,
+    validate_source_checkout,
+)
 
 
 SPLIT_FILE = REPO / "benchmarks" / "capability_twin" / "stage005_split.json"
@@ -128,8 +137,9 @@ def expected_provenance(
     llama_cpp_build: str,
     server_args: str,
     policy: SandboxPolicy,
+    extra: Optional[dict[str, Any]] = None,
 ) -> dict[str, Any]:
-    return {
+    provenance = {
         "phase": phase,
         "model": model,
         "model_label": model_label,
@@ -148,6 +158,9 @@ def expected_provenance(
         "sandbox_policy": asdict(policy),
         **contract_hashes(),
     }
+    if extra:
+        provenance.update(extra)
+    return provenance
 
 
 def validate_resume_row(
@@ -320,7 +333,9 @@ def validate_calibration_server_args(server_args: str) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--phase", choices=["engineering", "calibration"], required=True)
+    parser.add_argument(
+        "--phase", choices=["engineering", "calibration", CONFIRMATORY_PHASE], required=True
+    )
     parser.add_argument("--base-url", required=True)
     parser.add_argument("--model", required=True)
     parser.add_argument("--model-label", required=True)
@@ -334,6 +349,7 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--split-file", type=Path, default=SPLIT_FILE)
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT)
+    parser.add_argument("--confirmatory-lock", type=Path, default=CONFIRMATORY_LOCK_FILE)
     args = parser.parse_args()
 
     if args.phase == "calibration":
@@ -348,16 +364,50 @@ def main() -> int:
         _assert_contract_tree_clean()
         validate_calibration_server_args(args.server_args)
 
-    split = load_split(args.split_file)
-    task_ids = phase_task_ids(split, args.phase)
-    if args.limit is not None:
-        task_ids = task_ids[: args.limit]
-    assert_data_separation(args.data_dir, task_ids, split)
+    confirmatory_gate = None
+    if args.phase == CONFIRMATORY_PHASE:
+        try:
+            # This gate runs before any CogARC task path is checked or opened.
+            confirmatory_gate = validate_execution_lock(args.confirmatory_lock)
+            task_ids = list(confirmatory_gate.task_ids)
+            validate_source_checkout(args.data_dir.parent)
+        except ConfirmatoryAbort as exc:
+            raise SystemExit(str(exc)) from exc
+    else:
+        split = load_split(args.split_file)
+        task_ids = phase_task_ids(split, args.phase)
+        if args.limit is not None:
+            task_ids = task_ids[: args.limit]
+        assert_data_separation(args.data_dir, task_ids, split)
     if not args.model_file.is_file():
         raise SystemExit(f"missing model file: {args.model_file}")
 
     model_sha = sha256_file(args.model_file)
-    split_sha = sha256_bytes(args.split_file.read_bytes())
+    if confirmatory_gate is not None:
+        try:
+            validate_runtime_arguments(
+                confirmatory_gate,
+                model=args.model,
+                model_label=args.model_label,
+                model_sha256=model_sha,
+                source_commit=args.source_data_commit,
+                llama_cpp_build=args.llama_cpp_build,
+                server_args=args.server_args,
+                max_candidates=args.max_candidates,
+                limit=args.limit,
+                contract_commit=args.contract_commit,
+            )
+        except ConfirmatoryAbort as exc:
+            raise SystemExit(str(exc)) from exc
+        validate_calibration_server_args(args.server_args)
+        missing = [task_id for task_id in task_ids if not (args.data_dir / f"{task_id}.json").is_file()]
+        if missing:
+            raise SystemExit(f"missing frozen CogARC task IDs: {missing}")
+        split_sha = confirmatory_gate.fields["COGARC_EVAL_IDS_SHA256"]
+        extra_provenance = confirmatory_row_provenance(confirmatory_gate)
+    else:
+        split_sha = sha256_bytes(args.split_file.read_bytes())
+        extra_provenance = None
     policy = SandboxPolicy()
     expected = expected_provenance(
         args.phase,
@@ -371,6 +421,7 @@ def main() -> int:
         args.llama_cpp_build,
         args.server_args,
         policy,
+        extra_provenance,
     )
 
     phase_dir = args.out_dir / args.phase
@@ -386,7 +437,7 @@ def main() -> int:
         raise SystemExit(f"REFUSING RESUME: {exc}") from exc
     done = {(row["task_id"], row["candidate_index"]) for row in candidate_rows}
     client = OpenAICompatSynthesisClient(args.base_url, args.model)
-    if args.phase == "calibration":
+    if args.phase in {"calibration", CONFIRMATORY_PHASE}:
         actual_context_size = client.server_context_size()
         if actual_context_size != REQUIRED_CALIBRATION_CTX_SIZE:
             raise SystemExit(
