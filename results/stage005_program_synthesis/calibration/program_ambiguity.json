@@ -1,0 +1,178 @@
+{
+  "analysis_role": "POST_CALIBRATION_DESCRIPTIVE_NOT_USED_FOR_COMPUTE_SELECTION",
+  "conditional_disagreement_rate": 0.13636363636363635,
+  "disagreement_tasks": [
+    {
+      "all_certified_predictions_agree": false,
+      "all_certified_predictions_correct": false,
+      "all_certified_predictions_wrong": false,
+      "candidate_details": [
+        {
+          "candidate_index": 1,
+          "source_sha256": "43745782960dcca23eb77e8a425b04cea84cee1325fd53c0a8eaaf14c30ed6dc",
+          "target_correct": true
+        },
+        {
+          "candidate_index": 2,
+          "source_sha256": "3aa2709b53e378abdd72fa8c539112535831953ab9433a4dc1972939e4d58bbc",
+          "target_correct": true
+        },
+        {
+          "candidate_index": 3,
+          "source_sha256": "4cd30528bead31033510b5dd5b12952229e78a854840bc720f4e8c96a844b08d",
+          "target_correct": true
+        },
+        {
+          "candidate_index": 5,
+          "source_sha256": "ef9e888215171cfba95b70898277271f351f09497b42fa0cc5912a558ea27593",
+          "target_correct": true
+        },
+        {
+          "candidate_index": 6,
+          "source_sha256": "796b1273c125e3e6899066b236089a74fd3594a4ad57197d747fe0980af80002",
+          "target_correct": false
+        }
+      ],
+      "certified_candidate_count": 5,
+      "certified_correct_count": 4,
+      "certified_wrong_count": 1,
+      "selected_b8_candidate_index": 1,
+      "selected_b8_correct": true,
+      "task_id": "dc1df850",
+      "unique_certified_target_predictions": 2
+    },
+    {
+      "all_certified_predictions_agree": false,
+      "all_certified_predictions_correct": false,
+      "all_certified_predictions_wrong": false,
+      "candidate_details": [
+        {
+          "candidate_index": 1,
+          "source_sha256": "3d0ce3af809352bd744a459423222bc26f6b9072324544e07fd6610bfadaf65b",
+          "target_correct": true
+        },
+        {
+          "candidate_index": 2,
+          "source_sha256": "732253cc0bfe4354fedf8d15f25b5cef9498bd759032ccbf63fd7113643ca8cf",
+          "target_correct": true
+        },
+        {
+          "candidate_index": 4,
+          "source_sha256": "62167422f8ffbdb2f617d9e6e906926deab2d69ba071227b660720c9dddfa4b0",
+          "target_correct": false
+        },
+        {
+          "candidate_index": 6,
+          "source_sha256": "41f705a7b21c7ddcadcc85e8ff8f41dadd60e41a01c00b9cbff916a5deb691f9",
+          "target_correct": false
+        }
+      ],
+      "certified_candidate_count": 4,
+      "certified_correct_count": 2,
+      "certified_wrong_count": 2,
+      "selected_b8_candidate_index": 1,
+      "selected_b8_correct": true,
+      "task_id": "694f12f3",
+      "unique_certified_target_predictions": 3
+    },
+    {
+      "all_certified_predictions_agree": false,
+      "all_certified_predictions_correct": false,
+      "all_certified_predictions_wrong": false,
+      "candidate_details": [
+        {
+          "candidate_index": 1,
+          "source_sha256": "e30be49d746e94126f59c94d6401964d8c7eae67476f81c8cd9c0d428d31d0c8",
+          "target_correct": true
+        },
+        {
+          "candidate_index": 2,
+          "source_sha256": "52f69631c2cdc93bc3e67e6f16c70ca3d48e44718336ce8d1ca586f46f02cd28",
+          "target_correct": true
+        },
+        {
+          "candidate_index": 3,
+          "source_sha256": "306034c8686f0c8bab086b0f2274df690a1b79b0f6ad65a3e9c4cb74fd7ec4c3",
+          "target_correct": true
+        },
+        {
+          "candidate_index": 4,
+          "source_sha256": "945c14b3f21f368bc18824d7f027867f731d900182873fa778df67069d3623c9",
+          "target_correct": true
+        },
+        {
+          "candidate_index": 5,
+          "source_sha256": "8caeaf7ebc2ff10d6aed126f916bc865179894754424d0760f3b25cbb099bd65",
+          "target_correct": true
+        },
+        {
+          "candidate_index": 6,
+          "source_sha256": "56c108beef4fbaaa4a94a7a6316949e4989f8e8d7963bf48c3241c9b8e12f691",
+          "target_correct": false
+        },
+        {
+          "candidate_index": 7,
+          "source_sha256": "6c99f42dbc12c5c980fc5e587c25effb1222676e43a0a78c9a85c52010dbca83",
+          "target_correct": true
+        },
+        {
+          "candidate_index": 8,
+          "source_sha256": "450be5690b41094295ff5544d00ac3a60b32845ef055e5f556199357334200bc",
+          "target_correct": true
+        }
+      ],
+      "certified_candidate_count": 8,
+      "certified_correct_count": 7,
+      "certified_wrong_count": 1,
+      "selected_b8_candidate_index": 1,
+      "selected_b8_correct": true,
+      "task_id": "a79310a0",
+      "unique_certified_target_predictions": 2
+    }
+  ],
+  "n_tasks_with_any_certified_program": 26,
+  "n_tasks_with_certified_prediction_disagreement": 3,
+  "n_tasks_with_multiple_certified_programs": 22,
+  "n_tasks_with_unanimous_wrong_multiple_certified_programs": 1,
+  "unanimous_wrong_tasks": [
+    {
+      "all_certified_predictions_agree": true,
+      "all_certified_predictions_correct": false,
+      "all_certified_predictions_wrong": true,
+      "candidate_details": [
+        {
+          "candidate_index": 1,
+          "source_sha256": "e903c07aab88f8d4c496e91031280ec26049e1dbe2c159d1fa6b358b27a09f3a",
+          "target_correct": false
+        },
+        {
+          "candidate_index": 3,
+          "source_sha256": "956eafd214185e4a9db15b59aae7f566d3201eea15c04b963a85c8a4c3394b68",
+          "target_correct": false
+        },
+        {
+          "candidate_index": 4,
+          "source_sha256": "232b52b139568969834350b5ca50e83d2ee42a10decce99f85135c409957c156",
+          "target_correct": false
+        },
+        {
+          "candidate_index": 6,
+          "source_sha256": "4db4da73d780036e1f8495b5373fc202282b68a271a4409530c9d5021de73d9d",
+          "target_correct": false
+        },
+        {
+          "candidate_index": 8,
+          "source_sha256": "16835b303c268f12d4d79bf51e542c0dc22b6767dc3a47f5bb1b7d8288207d71",
+          "target_correct": false
+        }
+      ],
+      "certified_candidate_count": 5,
+      "certified_correct_count": 0,
+      "certified_wrong_count": 5,
+      "selected_b8_candidate_index": 1,
+      "selected_b8_correct": false,
+      "task_id": "60b61512",
+      "unique_certified_target_predictions": 1
+    }
+  ]
+}

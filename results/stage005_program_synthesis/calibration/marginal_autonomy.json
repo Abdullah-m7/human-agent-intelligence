@@ -1,0 +1,101 @@
+{
+  "certified_program_ambiguity": {
+    "disagreement_rate": 0.13636363636363635,
+    "tasks_with_multiple_certified_programs": 22,
+    "tasks_with_prediction_disagreement": 3
+  },
+  "n_tasks": 60,
+  "selected_certified_program_complexity": {
+    "B1": {
+      "certified_correct": {
+        "selected_ast_node_count": 239.44444444444446,
+        "selected_branch_count": 10.222222222222221,
+        "selected_source_length": 1486.3333333333333
+      },
+      "certified_wrong": {
+        "selected_ast_node_count": 681.0,
+        "selected_branch_count": 30.0,
+        "selected_source_length": 3787.0
+      },
+      "n_certified_correct": 9,
+      "n_certified_wrong": 1
+    },
+    "B2": {
+      "certified_correct": {
+        "selected_ast_node_count": 344.0,
+        "selected_branch_count": 14.533333333333333,
+        "selected_source_length": 1962.7333333333333
+      },
+      "certified_wrong": {
+        "selected_ast_node_count": 681.0,
+        "selected_branch_count": 30.0,
+        "selected_source_length": 3787.0
+      },
+      "n_certified_correct": 15,
+      "n_certified_wrong": 1
+    },
+    "B4": {
+      "certified_correct": {
+        "selected_ast_node_count": 364.40909090909093,
+        "selected_branch_count": 15.545454545454545,
+        "selected_source_length": 2343.7272727272725
+      },
+      "certified_wrong": {
+        "selected_ast_node_count": 681.0,
+        "selected_branch_count": 30.0,
+        "selected_source_length": 3787.0
+      },
+      "n_certified_correct": 22,
+      "n_certified_wrong": 1
+    },
+    "B8": {
+      "certified_correct": {
+        "selected_ast_node_count": 363.48,
+        "selected_branch_count": 15.6,
+        "selected_source_length": 2415.76
+      },
+      "certified_wrong": {
+        "selected_ast_node_count": 681.0,
+        "selected_branch_count": 30.0,
+        "selected_source_length": 3787.0
+      },
+      "n_certified_correct": 25,
+      "n_certified_wrong": 1
+    }
+  },
+  "transitions": [
+    {
+      "delta_act_coverage": 0.1,
+      "delta_capability": 0.08333333333333333,
+      "delta_uam": 0.0,
+      "high_budget": 2,
+      "low_budget": 1,
+      "new_autonomy_error_rate": 0.0,
+      "new_autonomy_n": 6,
+      "new_autonomy_precision": 1.0,
+      "transition": "B1->B2"
+    },
+    {
+      "delta_act_coverage": 0.11666666666666667,
+      "delta_capability": 0.1,
+      "delta_uam": 0.0,
+      "high_budget": 4,
+      "low_budget": 2,
+      "new_autonomy_error_rate": 0.0,
+      "new_autonomy_n": 7,
+      "new_autonomy_precision": 1.0,
+      "transition": "B2->B4"
+    },
+    {
+      "delta_act_coverage": 0.05,
+      "delta_capability": 0.05,
+      "delta_uam": 0.0,
+      "high_budget": 8,
+      "low_budget": 4,
+      "new_autonomy_error_rate": 0.0,
+      "new_autonomy_n": 3,
+      "new_autonomy_precision": 1.0,
+      "transition": "B4->B8"
+    }
+  ]
+}
